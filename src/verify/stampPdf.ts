@@ -178,7 +178,7 @@ function rewriteAppearance(context: PDFContext, ref: PDFRef, depth = 0, seen = n
     if (!(layer instanceof PDFStream)) continue;
     const key = name.asString();
 
-    if (key === '/n1' || key === '/n2') {
+    if (key === '/n1') {
       const [x0, y0, x1, y1] = numbers(layer.dict.lookupMaybe(N('BBox'), PDFArray), [0, 0, 100, 100]);
       const w = Math.abs(x1 - x0), h = Math.abs(y1 - y0);
       const minX = Math.min(x0, x1), minY = Math.min(y0, y1);
