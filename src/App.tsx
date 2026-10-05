@@ -86,8 +86,16 @@ export const App: React.FC = () => {
             colors: ['#126B44', '#10B981', '#34D399', '#D1FAE5']
           });
           addToast(`"${file.name}" digital signature verified successfully (PASS ✓)!`, 'success');
+        } else if (validated.status === 'already_verified') {
+          confetti({
+            particleCount: 50,
+            spread: 60,
+            origin: { y: 0.6 },
+            colors: ['#126B44', '#10B981', '#34D399']
+          });
+          addToast(`"${file.name}" is already verified with a permanent green checkmark!`, 'success');
         } else if (validated.status === 'unsigned') {
-          addToast(`No digital signature found in "${file.name}".`, 'warning');
+          addToast(`Error: No digital signature found in "${file.name}".`, 'error');
         } else {
           addToast(`"${file.name}": ${validated.summary}`, 'warning');
         }

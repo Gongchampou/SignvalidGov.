@@ -1,10 +1,11 @@
 export type VerificationStatus =
-  | 'valid'      // integrity OK + signature OK + chains to an official CCA India root
-  | 'untrusted'  // integrity & signature OK, but issuer does not chain to a CCA India root
-  | 'modified'   // signature OK but the file was changed after signing
-  | 'invalid'    // digest mismatch or cryptographic signature failure
-  | 'unsigned'   // no digital signature found in the PDF
-  | 'error';     // file could not be processed
+  | 'valid'             // integrity OK + signature OK + chains to an official CCA India root
+  | 'already_verified'  // file was already stamped/verified with permanent SignValid green tick
+  | 'untrusted'         // integrity & signature OK, but issuer does not chain to a CCA India root
+  | 'modified'          // signature OK but the file was changed after signing
+  | 'invalid'           // digest mismatch or cryptographic signature failure
+  | 'unsigned'          // no digital signature found in the PDF
+  | 'error';            // file could not be processed
 
 export interface SignatureReport {
   index: number;

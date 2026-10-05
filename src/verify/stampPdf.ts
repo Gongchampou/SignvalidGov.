@@ -278,7 +278,29 @@ async function loadDecrypted(file: ValidatedFile, password?: string): Promise<PD
   }
 }
 
+export function isAlreadyVerifiedPdf(bytes: Uint8Array): boolean {
+  if (!bytes || bytes.length === 0) return false;
+  // Decode sample from document to check for embedded markers
+  const text = new TextDecoder('latin1').decode(bytes);
+  return (
+    text.includes('SignValidVerified') ||
+    text.includes('PermanentGreenTick') ||
+    text.includes('SIGNVALID_VERIFIED') ||
+    text.includes('SignValid Display Copy')
+  );
+}
+
 export async function createGreenTickCopy(file: ValidatedFile, password?: string): Promise<Uint8Array> {
+  // If the document is already verified with a green tick, return original bytes directly (prevents double-up!)
+  if (isAlreadyVerifiedPdf(file.bytes) || file.status === 'already_verified') {
+    return file.bytes;
+  }
+
+  // If the document is missing digital signatures, do not attempt to stamp fake banners
+  if (file.status === 'unsigned' || file.signatures.length === 0) {
+    throw new Error('This document does not contain a digital signature to verify.');
+  }
+
   const doc = await loadDecrypted(file, password);
   const context = doc.context;
   const font = await doc.embedFont(StandardFonts.Helvetica);
@@ -367,7 +389,19 @@ export async function createGreenTickCopy(file: ValidatedFile, password?: string
     page.drawText(note, { x: 12, y: 5, size, font, color: rgb(0.35, 0.38, 0.42) });
   }
 
-  return doc.save({ useObjectStreams: false });
+  // Embed persistent uncompressed markers in catalog and metadata
+  doc.catalog.set(PDFName.of('SignValidVerified'), PDFName.of('PermanentGreenTick'));
+  doc.setProducer('SignValid Universal Display Engine (CCA India Compliant)');
+  doc.setSubject('SignValid Verified Display Copy');
+  doc.setKeywords(['SignValid', 'Verified', 'CCA India', 'GreenTick']);
+
+  const savedBytes = await doc.save({ useObjectStreams: false });
+  // Append permanent comment marker (compliant with PDF ISO 32000)
+  const marker = new TextEncoder().encode('\n%SIGNVALID_VERIFIED_DISPLAY_COPY%\n');
+  const finalBytes = new Uint8Array(savedBytes.length + marker.length);
+  finalBytes.set(savedBytes, 0);
+  finalBytes.set(marker, savedBytes.length);
+  return finalBytes;
 }
 
 export function downloadBytes(bytes: Uint8Array, filename: string) {

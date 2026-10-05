@@ -58,6 +58,21 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
       setIsStamping(true);
       setStampError(null);
 
+      // If document is already verified, directly download the clean verified file
+      if (currentDoc.status === 'already_verified') {
+        const outName = currentDoc.name.endsWith('_verified.pdf')
+          ? currentDoc.name
+          : currentDoc.name.replace(/\.pdf$/i, '') + '_verified.pdf';
+        downloadBytes(currentDoc.bytes, outName);
+        return;
+      }
+
+      // If document is unsigned, report clear error and do not stamp
+      if (currentDoc.status === 'unsigned' || currentDoc.signatures.length === 0) {
+        setStampError('Error: This document has no digital signature to verify or stamp.');
+        return;
+      }
+
       const stampedBytes = await createGreenTickCopy(currentDoc, pwd);
       const outName = currentDoc.name.replace(/\.pdf$/i, '') + '_verified.pdf';
       downloadBytes(stampedBytes, outName);
@@ -70,7 +85,7 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
         setStampError('This document is encrypted. Please enter its password (e.g. e-Aadhaar password is first 4 letters of name in CAPITAL + birth year).');
       } else {
         const msg = err instanceof Error ? err.message : String(err);
-        setStampError('Error applying green tick: ' + msg);
+        setStampError('Error: ' + msg);
       }
     } finally {
       setIsStamping(false);
@@ -81,7 +96,7 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
     generateValidatedPdf(currentDoc);
   };
 
-  const isPass = currentDoc.status === 'valid';
+  const isPass = currentDoc.status === 'valid' || currentDoc.status === 'already_verified';
 
   return (
     <div className="results-card" id="results-view">
@@ -212,10 +227,20 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
         </div>
 
         <div className="results-header-actions">
-          {isPass ? (
+          {currentDoc.status === 'already_verified' ? (
+            <div className="status-badge-pass" style={{ backgroundColor: '#ECFDF5', borderColor: '#6EE7B7', color: '#047857' }}>
+              <CheckCircle2 size={16} strokeWidth={2.5} />
+              <span>Already Verified: Green Tick Embedded ✓</span>
+            </div>
+          ) : isPass ? (
             <div className="status-badge-pass">
               <Check size={16} strokeWidth={3} />
               <span>Pass: Valid Digital Signature</span>
+            </div>
+          ) : currentDoc.status === 'unsigned' ? (
+            <div className="state-pill unknown" style={{ backgroundColor: '#FEF2F2', borderColor: '#FECACA', color: '#B91C1C' }}>
+              <AlertCircle size={16} />
+              <span>Error: Missing Signature</span>
             </div>
           ) : (
             <div className="state-pill unknown">
@@ -247,6 +272,44 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Alert Banner for Already Verified */}
+      {currentDoc.status === 'already_verified' && (
+        <div style={{
+          backgroundColor: '#ECFDF5',
+          border: '1px solid #A7F3D0',
+          borderRadius: 'var(--radius-md)',
+          padding: '12px 18px',
+          margin: '12px 20px 0 20px',
+          display: 'flex',
+          gap: '10px',
+          alignItems: 'center'
+        }}>
+          <CheckCircle2 size={18} color="#059669" style={{ flexShrink: 0 }} />
+          <div style={{ fontSize: '0.84rem', color: '#065F46' }}>
+            <strong>Document is Already Verified:</strong> This file already contains the authentic permanent green checkmark (✓). No re-verification or duplicate stamping is needed.
+          </div>
+        </div>
+      )}
+
+      {/* Alert Banner for Missing Signature */}
+      {currentDoc.status === 'unsigned' && (
+        <div style={{
+          backgroundColor: '#FEF2F2',
+          border: '1px solid #FECACA',
+          borderRadius: 'var(--radius-md)',
+          padding: '12px 18px',
+          margin: '12px 20px 0 20px',
+          display: 'flex',
+          gap: '10px',
+          alignItems: 'center'
+        }}>
+          <AlertCircle size={18} color="#DC2626" style={{ flexShrink: 0 }} />
+          <div style={{ fontSize: '0.84rem', color: '#991B1B' }}>
+            <strong>Error: Missing Digital Signature.</strong> This PDF does not contain an Indian digital certificate or cryptographic signature dictionary. Only digitally signed government documents can be verified.
+          </div>
+        </div>
+      )}
 
       {/* Live Interactive Document Preview */}
       <PdfLivePreview
@@ -466,17 +529,40 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
         <div className="results-actions-wrapper">
           <div className="results-actions-group">
             <div className="results-actions-primary-btns">
-              {/* PRIMARY BUTTON: Downloads the user's actual PDF with the green checkmark stamped! */}
-              <button
-                type="button"
-                className="download-cta-btn"
-                onClick={() => handleDownloadStampedPdf()}
-                disabled={isStamping}
-                title={`Download ${currentDoc.name} with all pages preserved and yellow '?' replaced by green tick ✓`}
-              >
-                <Download size={18} />
-                <span>{isStamping ? 'Stamping Green Tick...' : 'Download Validated PDF (with Green Tick ✓)'}</span>
-              </button>
+              {/* PRIMARY BUTTON */}
+              {currentDoc.status === 'already_verified' ? (
+                <button
+                  type="button"
+                  className="download-cta-btn"
+                  onClick={() => handleDownloadStampedPdf()}
+                  title="Save verified PDF (already contains permanent green checkmark)"
+                >
+                  <Download size={18} />
+                  <span>Download Verified PDF (Green Tick Embedded ✓)</span>
+                </button>
+              ) : currentDoc.status === 'unsigned' ? (
+                <button
+                  type="button"
+                  className="download-cta-btn"
+                  disabled
+                  style={{ opacity: 0.5, cursor: 'not-allowed', backgroundColor: '#9CA3AF' }}
+                  title="Cannot stamp: Missing digital signature"
+                >
+                  <AlertCircle size={18} />
+                  <span>Cannot Stamp (Missing Signature)</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="download-cta-btn"
+                  onClick={() => handleDownloadStampedPdf()}
+                  disabled={isStamping}
+                  title={`Download ${currentDoc.name} with all pages preserved and yellow '?' replaced by green tick ✓`}
+                >
+                  <Download size={18} />
+                  <span>{isStamping ? 'Stamping Green Tick...' : 'Download Validated PDF (with Green Tick ✓)'}</span>
+                </button>
+              )}
 
               <button
                 type="button"

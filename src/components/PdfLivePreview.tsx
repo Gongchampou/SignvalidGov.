@@ -50,7 +50,14 @@ export const PdfLivePreview: React.FC<PdfLivePreviewProps> = ({
     let isCancelled = false;
 
     const prepareStampedBytes = async () => {
-      // Only skip if file is completely unsigned or has an error
+      // 1. If file is already verified, it already has the permanent green tick!
+      if (file.status === 'already_verified') {
+        setStampedBytes(file.bytes);
+        setViewMode('stamped');
+        return;
+      }
+
+      // 2. Only skip if file is completely unsigned or has an error (prevent double up/fake stamps)
       if (file.status === 'unsigned' || file.status === 'error' || file.signatures.length === 0) {
         setStampedBytes(null);
         setViewMode('original');
@@ -237,24 +244,38 @@ export const PdfLivePreview: React.FC<PdfLivePreviewProps> = ({
       <div className="pdf-preview-toolbar">
         {/* Toggle Mode: Stamped Green Tick vs Original */}
         <div className="pdf-preview-mode-toggle">
-          <button
-            type="button"
-            className={`pdf-mode-btn ${viewMode === 'stamped' ? 'active' : ''}`}
-            onClick={() => setViewMode('stamped')}
-            disabled={isStamping}
-          >
-            <CheckCircle2 size={14} color={viewMode === 'stamped' ? '#FFFFFF' : '#16A34A'} />
-            <span>Verified Live Copy (Green Tick ✓)</span>
-          </button>
+          {file.status === 'already_verified' ? (
+            <div className="pdf-mode-btn active" style={{ cursor: 'default' }}>
+              <CheckCircle2 size={14} color="#FFFFFF" />
+              <span>Already Verified (Permanent Green Tick ✓ Active)</span>
+            </div>
+          ) : file.status === 'unsigned' ? (
+            <div className="pdf-mode-btn" style={{ borderColor: '#FECACA', color: '#B91C1C', cursor: 'default', backgroundColor: '#FEF2F2' }}>
+              <AlertCircle size={14} color="#DC2626" />
+              <span>Missing Signature (Unsigned Document)</span>
+            </div>
+          ) : (
+            <>
+              <button
+                type="button"
+                className={`pdf-mode-btn ${viewMode === 'stamped' ? 'active' : ''}`}
+                onClick={() => setViewMode('stamped')}
+                disabled={isStamping}
+              >
+                <CheckCircle2 size={14} color={viewMode === 'stamped' ? '#FFFFFF' : '#16A34A'} />
+                <span>Verified Live Copy (Green Tick ✓)</span>
+              </button>
 
-          <button
-            type="button"
-            className={`pdf-mode-btn ${viewMode === 'original' ? 'active' : ''}`}
-            onClick={() => setViewMode('original')}
-          >
-            <AlertCircle size={14} color={viewMode === 'original' ? '#FFFFFF' : '#D97706'} />
-            <span>Original (?)</span>
-          </button>
+              <button
+                type="button"
+                className={`pdf-mode-btn ${viewMode === 'original' ? 'active' : ''}`}
+                onClick={() => setViewMode('original')}
+              >
+                <AlertCircle size={14} color={viewMode === 'original' ? '#FFFFFF' : '#D97706'} />
+                <span>Original (?)</span>
+              </button>
+            </>
+          )}
         </div>
 
         {/* Page Navigation & Zoom Tools */}
@@ -356,7 +377,17 @@ export const PdfLivePreview: React.FC<PdfLivePreviewProps> = ({
 
             {/* Live Indicator Watermark Pill */}
             <div className="pdf-live-badge">
-              {viewMode === 'stamped' ? (
+              {file.status === 'already_verified' ? (
+                <>
+                  <CheckCircle2 size={13} color="#16A34A" />
+                  <span>Already Verified Document · Green Tick Embedded ✓</span>
+                </>
+              ) : file.status === 'unsigned' ? (
+                <>
+                  <AlertCircle size={13} color="#DC2626" />
+                  <span>Unsigned Document · Missing Signature</span>
+                </>
+              ) : viewMode === 'stamped' ? (
                 <>
                   <Sparkles size={13} color="#16A34A" />
                   <span>Verified Live Copy · CCA Trusted</span>
@@ -364,7 +395,7 @@ export const PdfLivePreview: React.FC<PdfLivePreviewProps> = ({
               ) : (
                 <>
                   <AlertCircle size={13} color="#D97706" />
-                  <span>Original Document Copy</span>
+                  <span>Original Document Copy (?)</span>
                 </>
               )}
             </div>
@@ -375,15 +406,23 @@ export const PdfLivePreview: React.FC<PdfLivePreviewProps> = ({
       {/* Bottom Hint Bar */}
       <div className="pdf-preview-bottom-bar">
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.8rem', color: 'var(--color-muted)' }}>
-          <CheckCircle2 size={14} color="var(--primary-green)" flex-shrink={0} />
+          {file.status === 'unsigned' ? (
+            <AlertCircle size={14} color="#DC2626" style={{ flexShrink: 0 }} />
+          ) : (
+            <CheckCircle2 size={14} color="var(--primary-green)" style={{ flexShrink: 0 }} />
+          )}
           <span>
-            {viewMode === 'stamped'
+            {file.status === 'already_verified'
+              ? 'This document was already verified by SignValid. The authentic green tick is permanently embedded and universally valid.'
+              : file.status === 'unsigned'
+              ? 'Error: Missing digital signature. This document cannot be stamped because no digital certificate was detected.'
+              : viewMode === 'stamped'
               ? 'Displaying your actual document with the authentic green checkmark ✓ stamped directly on the signature area.'
               : 'Displaying original PDF with unverified question mark (?). Toggle above to see verified tick.'}
           </span>
         </div>
 
-        {onDownloadStamped && (
+        {onDownloadStamped && file.status !== 'unsigned' && (
           <button
             type="button"
             className="download-cta-btn"
@@ -391,7 +430,7 @@ export const PdfLivePreview: React.FC<PdfLivePreviewProps> = ({
             style={{ padding: '8px 18px', fontSize: '0.84rem' }}
           >
             <Download size={15} />
-            <span>Download Verified PDF</span>
+            <span>{file.status === 'already_verified' ? 'Save Verified PDF' : 'Download Verified PDF'}</span>
           </button>
         )}
       </div>
