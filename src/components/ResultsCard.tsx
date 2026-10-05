@@ -205,7 +205,7 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
                 {/* Authentic Adobe 3D green checkmark SVG with black drop shadow */}
                 <svg width="78" height="78" viewBox="0 0 100 100" style={{ filter: 'drop-shadow(2px 3px 0px #000000)' }}>
                   <path
-                    d="M 36 8 L 5 44 L 17 56 L 37 32 L 83 94 L 97 80 Z"
+                    d="M 36 92 L 5 56 L 17 44 L 37 68 L 83 6 L 97 20 Z"
                     fill="#00A651"
                     stroke="#000000"
                     strokeWidth="1.6"
