@@ -28,6 +28,20 @@ export interface SignatureReport {
   problems: string[];
 }
 
+export interface SignatureMetadata {
+  documentType: string;
+  signerIdentity: string;
+  certificateAuthority: string;
+  timestamp: string;
+  hashAlgorithm: string;
+  signatureAlgorithm: string;
+  crlOcspStatus: string;
+  certificateSerial: string;
+  validUntil: string;
+  ccaTrustChain: string[];
+  docFingerprint: string;
+}
+
 export interface ValidatedFile {
   id: string;
   name: string;
@@ -38,7 +52,10 @@ export interface ValidatedFile {
   encrypted: boolean;
   sha256: string;
   signatures: SignatureReport[];
+  metadata: SignatureMetadata;
   bytes: Uint8Array;
+  sampleType?: string;
+  originalFile?: File;
 }
 
 export interface SupportedDocCategory {

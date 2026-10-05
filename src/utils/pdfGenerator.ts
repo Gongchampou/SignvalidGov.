@@ -102,7 +102,7 @@ export function generateValidatedPdf(doc: ValidatedFile): void {
   pdf.line(14, yPos, pageWidth - 14, yPos);
   yPos += 7;
 
-  meta.ccaTrustChain.forEach((chainItem, idx) => {
+  meta.ccaTrustChain.forEach((chainItem: string, idx: number) => {
     pdf.setFillColor(243, 244, 246);
     pdf.roundedRect(14, yPos - 4.5, pageWidth - 28, 7.5, 1.5, 1.5, 'F');
 

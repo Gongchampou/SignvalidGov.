@@ -7,10 +7,13 @@ import {
   Layers,
   RefreshCw,
   Eye,
-  Check
+  Check,
+  FileCheck,
+  Key
 } from 'lucide-react';
 import type { ValidatedFile } from '../types';
 import { generateValidatedPdf } from '../utils/pdfGenerator';
+import { createGreenTickCopy, downloadBytes, PasswordRequiredError } from '../verify/stampPdf';
 
 interface ResultsCardProps {
   files: ValidatedFile[];
@@ -28,6 +31,11 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
   onReset
 }) => {
   const [previewTab, setPreviewTab] = useState<'universal' | 'adobe'>('universal');
+  const [isStamping, setIsStamping] = useState<boolean>(false);
+  const [stampError, setStampError] = useState<string | null>(null);
+  const [showPasswordPrompt, setShowPasswordPrompt] = useState<boolean>(false);
+  const [passwordInput, setPasswordInput] = useState<string>('');
+
   const currentDoc = files[activeFileIndex] || files[0];
 
   if (!currentDoc) return null;
@@ -40,9 +48,35 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
     return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
   };
 
-  const handleDownload = () => {
+  const handleDownloadStampedPdf = async (pwd?: string) => {
+    try {
+      setIsStamping(true);
+      setStampError(null);
+
+      const stampedBytes = await createGreenTickCopy(currentDoc, pwd);
+      const outName = currentDoc.name.replace(/\.pdf$/i, '') + '_verified.pdf';
+      downloadBytes(stampedBytes, outName);
+
+      setShowPasswordPrompt(false);
+      setPasswordInput('');
+    } catch (err: unknown) {
+      if (err instanceof PasswordRequiredError) {
+        setShowPasswordPrompt(true);
+        setStampError('This document is encrypted. Please enter its password (e.g. e-Aadhaar password is first 4 letters of name in CAPITAL + birth year).');
+      } else {
+        const msg = err instanceof Error ? err.message : String(err);
+        setStampError('Error applying green tick: ' + msg);
+      }
+    } finally {
+      setIsStamping(false);
+    }
+  };
+
+  const handleDownloadSummaryCertificate = () => {
     generateValidatedPdf(currentDoc);
   };
+
+  const isPass = currentDoc.status === 'valid';
 
   return (
     <div className="results-card" id="results-view">
@@ -87,8 +121,11 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
       {/* Header Banner */}
       <div className="results-header-banner">
         <div className="doc-info-left">
-          <div className="doc-type-icon">
-            <CheckCircle2 size={26} strokeWidth={2.5} />
+          <div className="doc-type-icon" style={{
+            backgroundColor: isPass ? 'var(--success-bg)' : 'var(--warning-bg)',
+            color: isPass ? 'var(--success-text)' : 'var(--warning-text)'
+          }}>
+            {isPass ? <CheckCircle2 size={26} strokeWidth={2.5} /> : <AlertCircle size={26} strokeWidth={2.5} />}
           </div>
           <div>
             <h3 className="doc-title-name">{currentDoc.name}</h3>
@@ -103,10 +140,17 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
         </div>
 
         <div>
-          <div className="status-badge-pass">
-            <Check size={16} strokeWidth={3} />
-            <span>Pass: Valid Signature</span>
-          </div>
+          {isPass ? (
+            <div className="status-badge-pass">
+              <Check size={16} strokeWidth={3} />
+              <span>Pass: Valid Digital Signature</span>
+            </div>
+          ) : (
+            <div className="state-pill unknown">
+              <AlertCircle size={16} />
+              <span>Status: {currentDoc.status.toUpperCase()}</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -114,7 +158,7 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
       <div className="preview-comparison-box">
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
           <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-heading)' }}>
-            VISUAL SIGNATURE REPRESENTATION
+            VISUAL SIGNATURE TRANSFORMATION
           </span>
           <div className="comparison-toggle-tabs">
             <button
@@ -123,7 +167,7 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
               onClick={() => setPreviewTab('universal')}
             >
               <CheckCircle2 size={14} />
-              <span>SignValid Universal Copy</span>
+              <span>SignValid Green Tick Copy</span>
             </button>
             <button
               type="button"
@@ -131,7 +175,7 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
               onClick={() => setPreviewTab('adobe')}
             >
               <AlertCircle size={14} />
-              <span>Adobe Acrobat Default</span>
+              <span>Original Adobe "?" Display</span>
             </button>
           </div>
         </div>
@@ -157,7 +201,7 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
               </div>
               <div style={{ textAlign: 'right' }}>
                 <span className="state-pill valid" style={{ fontSize: '0.78rem' }}>
-                  Works on all viewers & printouts
+                  ✓ Yellow "?" replaced with green tick
                 </span>
               </div>
             </>
@@ -169,19 +213,19 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
                 </div>
                 <div>
                   <div className="stamp-text-title" style={{ color: 'var(--warning-text)' }}>
-                    Validity Unknown · At least one signature has problems
+                    Validity Unknown · Signature Not Verified
                   </div>
                   <div className="stamp-text-desc">
-                    Adobe Reader warning triggered by missing Indian CCA Root 2014 in default AATL.
+                    Adobe Reader warning triggered by missing Indian CCA Root in standard default AATL store.
                   </div>
                   <div style={{ fontSize: '0.78rem', color: 'var(--color-muted)', marginTop: 2 }}>
-                    Document integrity is actually intact; only Adobe’s certificate bundle is missing trust.
+                    Original file shows confusing yellow question mark on phones and printouts.
                   </div>
                 </div>
               </div>
               <div style={{ textAlign: 'right' }}>
                 <span className="state-pill unknown" style={{ fontSize: '0.78rem' }}>
-                  Confusing to recipients
+                  ? Unverified question mark
                 </span>
               </div>
             </>
@@ -189,11 +233,61 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
         </div>
       </div>
 
+      {/* Password Prompt if Encrypted */}
+      {showPasswordPrompt && (
+        <div style={{
+          backgroundColor: '#FFFBEB',
+          borderBottom: '1px solid #FCD34D',
+          padding: '16px 28px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '10px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#B45309', fontWeight: 600, fontSize: '0.9rem' }}>
+            <Key size={16} />
+            <span>PDF Password Required</span>
+          </div>
+          <p style={{ fontSize: '0.82rem', color: '#92400E' }}>
+            {stampError || 'This document is protected with a password (e.g. e-Aadhaar password is first 4 letters of name in CAPITAL + year of birth).'}
+          </p>
+          <div style={{ display: 'flex', gap: 10, maxWidth: 420 }}>
+            <input
+              type="password"
+              placeholder="Enter document password"
+              value={passwordInput}
+              onChange={(e) => setPasswordInput(e.target.value)}
+              style={{
+                flex: 1,
+                padding: '8px 12px',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid #D97706',
+                outline: 'none'
+              }}
+            />
+            <button
+              type="button"
+              className="download-cta-btn"
+              onClick={() => handleDownloadStampedPdf(passwordInput)}
+              disabled={isStamping || !passwordInput}
+              style={{ padding: '8px 16px', fontSize: '0.85rem' }}
+            >
+              {isStamping ? 'Unlocking...' : 'Unlock & Download'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {stampError && !showPasswordPrompt && (
+        <div style={{ backgroundColor: '#FEF2F2', padding: '12px 28px', color: '#991B1B', fontSize: '0.85rem' }}>
+          {stampError}
+        </div>
+      )}
+
       {/* Metadata Breakdown Grid */}
       <div className="metadata-grid-wrapper">
         <div className="metadata-grid-title">
           <ShieldCheck size={18} style={{ color: 'var(--primary-green)' }} />
-          <span>Cryptographic Signature Metadata</span>
+          <span>Real Cryptographic Signature Metadata (Extracted from your PDF)</span>
         </div>
 
         <div className="metadata-grid">
@@ -203,7 +297,7 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
           </div>
 
           <div className="metadata-cell">
-            <span className="meta-label">Signer Identity / Common Name</span>
+            <span className="meta-label">Signer Common Name / Authority</span>
             <span className="meta-value">{meta.signerIdentity}</span>
           </div>
 
@@ -223,8 +317,8 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
           </div>
 
           <div className="metadata-cell">
-            <span className="meta-label">Revocation Status (CRL & OCSP)</span>
-            <span className="meta-value" style={{ color: 'var(--success-text)' }}>
+            <span className="meta-label">CCA Root Validation</span>
+            <span className="meta-value" style={{ color: isPass ? 'var(--success-text)' : 'var(--warning-text)' }}>
               {meta.crlOcspStatus}
             </span>
           </div>
@@ -236,11 +330,11 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
             <Layers size={14} />
             <span>Controller of Certifying Authorities (CCA) Trust Path</span>
           </span>
-          {meta.ccaTrustChain.map((step, idx) => (
+          {meta.ccaTrustChain.map((step: string, idx: number) => (
             <div key={idx} className="chain-item">
               <span className="chain-step-num">L{idx + 1}</span>
               <span>{step}</span>
-              {idx === 0 && <span style={{ fontSize: '0.72rem', color: 'var(--primary-green)', fontWeight: 600 }}>[Official Root]</span>}
+              {idx === 0 && <span style={{ fontSize: '0.72rem', color: 'var(--primary-green)', fontWeight: 600 }}>[Root Trust Anchor]</span>}
             </div>
           ))}
         </div>
@@ -248,35 +342,60 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
 
       {/* Action CTAs Bar */}
       <div className="results-actions-bar">
-        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-          <button
-            type="button"
-            className="download-cta-btn"
-            onClick={handleDownload}
-          >
-            <Download size={18} />
-            <span>Download Validated PDF</span>
-          </button>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%' }}>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+              {/* PRIMARY BUTTON: Downloads the user's actual PDF with the green checkmark stamped! */}
+              <button
+                type="button"
+                className="download-cta-btn"
+                onClick={() => handleDownloadStampedPdf()}
+                disabled={isStamping}
+                title={`Download ${currentDoc.name} with all pages preserved and yellow '?' replaced by green tick ✓`}
+              >
+                <Download size={18} />
+                <span>{isStamping ? 'Stamping Green Tick...' : 'Download Validated PDF (with Green Tick ✓)'}</span>
+              </button>
 
-          <button
-            type="button"
-            className="secondary-action-btn"
-            onClick={() => onOpenReportModal(currentDoc)}
-          >
-            <Eye size={16} />
-            <span>View Full Verification Report</span>
-          </button>
+              <button
+                type="button"
+                className="secondary-action-btn"
+                onClick={() => onOpenReportModal(currentDoc)}
+              >
+                <Eye size={16} />
+                <span>View Full Verification Audit</span>
+              </button>
+
+              <button
+                type="button"
+                className="secondary-action-btn"
+                onClick={handleDownloadSummaryCertificate}
+                title="Download 1-page standalone verification report & audit sheet"
+                style={{ fontSize: '0.82rem' }}
+              >
+                <FileCheck size={15} />
+                <span>1-Page Summary Certificate</span>
+              </button>
+            </div>
+
+            <button
+              type="button"
+              className="secondary-action-btn"
+              onClick={onReset}
+              style={{ color: 'var(--color-muted)' }}
+            >
+              <RefreshCw size={15} />
+              <span>Validate Another Document</span>
+            </button>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.78rem', color: 'var(--color-muted)', paddingLeft: 4 }}>
+            <CheckCircle2 size={13} style={{ color: 'var(--primary-green)' }} />
+            <span>
+              <strong>Primary Download:</strong> Exports your actual original document (<em>{currentDoc.name.replace(/\.pdf$/i, '')}_verified.pdf</em>) with all pages preserved and the unverified '?' replaced with a permanent green checkmark.
+            </span>
+          </div>
         </div>
-
-        <button
-          type="button"
-          className="secondary-action-btn"
-          onClick={onReset}
-          style={{ color: 'var(--color-muted)' }}
-        >
-          <RefreshCw size={15} />
-          <span>Validate Another Document</span>
-        </button>
       </div>
     </div>
   );

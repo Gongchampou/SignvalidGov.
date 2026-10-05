@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { X, ShieldCheck, Copy, Download, Key, Lock, FileCheck } from 'lucide-react';
 import type { ValidatedFile } from '../types';
 import { generateValidatedPdf } from '../utils/pdfGenerator';
+import { createGreenTickCopy, downloadBytes, PasswordRequiredError } from '../verify/stampPdf';
 
 interface ReportModalProps {
   file: ValidatedFile | null;
@@ -14,7 +15,34 @@ export const ReportModal: React.FC<ReportModalProps> = ({
   onClose,
   onCopyDigest
 }) => {
+  const [isStamping, setIsStamping] = useState<boolean>(false);
+  const [stampError, setStampError] = useState<string | null>(null);
+  const [passwordInput, setPasswordInput] = useState<string>('');
+  const [showPasswordPrompt, setShowPasswordPrompt] = useState<boolean>(false);
+
   if (!file) return null;
+
+  const handleDownloadStamped = async (pwd?: string) => {
+    try {
+      setIsStamping(true);
+      setStampError(null);
+      const stampedBytes = await createGreenTickCopy(file, pwd);
+      const outName = file.name.replace(/\.pdf$/i, '') + '_verified.pdf';
+      downloadBytes(stampedBytes, outName);
+      setShowPasswordPrompt(false);
+      setPasswordInput('');
+    } catch (err: unknown) {
+      if (err instanceof PasswordRequiredError) {
+        setShowPasswordPrompt(true);
+        setStampError('This document is encrypted. Please enter its password.');
+      } else {
+        const msg = err instanceof Error ? err.message : String(err);
+        setStampError('Error stamping green tick: ' + msg);
+      }
+    } finally {
+      setIsStamping(false);
+    }
+  };
 
   const meta = file.metadata;
 
@@ -130,7 +158,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({
                 <span>3. X.509 Certificate Chain of Trust</span>
               </h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {meta.ccaTrustChain.map((chain, i) => (
+                {meta.ccaTrustChain.map((chain: string, i: number) => (
                   <div key={i} style={{
                     padding: '10px 14px',
                     borderRadius: 'var(--radius-md)',
@@ -177,23 +205,67 @@ export const ReportModal: React.FC<ReportModalProps> = ({
           </div>
         </div>
 
-        <div className="modal-footer">
+        {showPasswordPrompt && (
+          <div style={{ backgroundColor: '#FFFBEB', padding: '12px 24px', borderTop: '1px solid #FCD34D', display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <span style={{ fontSize: '0.82rem', color: '#92400E', fontWeight: 600 }}>Enter Document Password to Apply Green Tick:</span>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <input
+                type="password"
+                placeholder="Password"
+                value={passwordInput}
+                onChange={(e) => setPasswordInput(e.target.value)}
+                style={{ flex: 1, padding: '6px 10px', borderRadius: 'var(--radius-sm)', border: '1px solid #D97706' }}
+              />
+              <button
+                type="button"
+                className="download-cta-btn"
+                onClick={() => handleDownloadStamped(passwordInput)}
+                disabled={isStamping || !passwordInput}
+                style={{ padding: '6px 14px', fontSize: '0.82rem' }}
+              >
+                {isStamping ? 'Unlocking...' : 'Unlock & Download'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {stampError && !showPasswordPrompt && (
+          <div style={{ backgroundColor: '#FEF2F2', padding: '10px 24px', color: '#991B1B', fontSize: '0.82rem' }}>
+            {stampError}
+          </div>
+        )}
+
+        <div className="modal-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
           <button
             type="button"
             className="secondary-action-btn"
             onClick={onClose}
-            style={{ marginRight: 8 }}
           >
             Close Report
           </button>
-          <button
-            type="button"
-            className="download-cta-btn"
-            onClick={() => generateValidatedPdf(file)}
-          >
-            <Download size={16} />
-            <span>Download Validated PDF</span>
-          </button>
+
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+            <button
+              type="button"
+              className="secondary-action-btn"
+              onClick={() => generateValidatedPdf(file)}
+              title="Download 1-page official verification audit certificate"
+              style={{ fontSize: '0.82rem' }}
+            >
+              <FileCheck size={15} />
+              <span>1-Page Summary Certificate</span>
+            </button>
+
+            <button
+              type="button"
+              className="download-cta-btn"
+              onClick={() => handleDownloadStamped()}
+              disabled={isStamping}
+            >
+              <Download size={16} />
+              <span>{isStamping ? 'Stamping Green Tick...' : 'Download Validated PDF (with Green Tick ✓)'}</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
