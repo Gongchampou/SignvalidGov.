@@ -18,6 +18,7 @@ interface HeroProps {
   onSelectFileIndex: (idx: number) => void;
   onOpenReportModal: (file: ValidatedFile) => void;
   onReset: () => void;
+  onRemoveFile?: (idx: number) => void;
   isProcessing: boolean;
   processingProgress: number;
   processingStep: string;
@@ -34,6 +35,7 @@ export const Hero: React.FC<HeroProps> = ({
   onSelectFileIndex,
   onOpenReportModal,
   onReset,
+  onRemoveFile,
   isProcessing,
   processingProgress,
   processingStep,
@@ -138,6 +140,7 @@ export const Hero: React.FC<HeroProps> = ({
                 onSelectFileIndex={onSelectFileIndex}
                 onOpenReportModal={onOpenReportModal}
                 onReset={onReset}
+                onRemoveFile={onRemoveFile}
               />
             ) : (
               <Dropzone

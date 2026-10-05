@@ -5,11 +5,13 @@ import {
   Download,
   ShieldCheck,
   Layers,
-  RefreshCw,
   Eye,
   Check,
   FileCheck,
-  Key
+  Key,
+  X,
+  RotateCcw,
+  Trash2
 } from 'lucide-react';
 import type { ValidatedFile } from '../types';
 import { generateValidatedPdf } from '../utils/pdfGenerator';
@@ -21,6 +23,7 @@ interface ResultsCardProps {
   onSelectFileIndex: (idx: number) => void;
   onOpenReportModal: (file: ValidatedFile) => void;
   onReset: () => void;
+  onRemoveFile?: (idx: number) => void;
 }
 
 export const ResultsCard: React.FC<ResultsCardProps> = ({
@@ -28,7 +31,8 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
   activeFileIndex,
   onSelectFileIndex,
   onOpenReportModal,
-  onReset
+  onReset,
+  onRemoveFile
 }) => {
   const [previewTab, setPreviewTab] = useState<'universal' | 'adobe'>('universal');
   const [isStamping, setIsStamping] = useState<boolean>(false);
@@ -85,36 +89,103 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
         <div style={{
           backgroundColor: '#F8FAFC',
           borderBottom: '1px solid var(--border-subtle)',
-          padding: '12px 24px',
+          padding: '10px 20px',
           display: 'flex',
           gap: '8px',
-          overflowX: 'auto'
+          overflowX: 'auto',
+          alignItems: 'center',
+          justifyContent: 'space-between'
         }}>
-          {files.map((f, i) => (
-            <button
-              key={f.id}
-              type="button"
-              onClick={() => onSelectFileIndex(i)}
-              style={{
-                fontSize: '0.82rem',
-                fontWeight: 600,
-                padding: '6px 14px',
-                borderRadius: 'var(--radius-full)',
-                border: '1px solid',
-                borderColor: i === activeFileIndex ? 'var(--primary-green)' : 'var(--border-subtle)',
-                backgroundColor: i === activeFileIndex ? 'var(--primary-green)' : '#FFFFFF',
-                color: i === activeFileIndex ? '#FFFFFF' : 'var(--color-body)',
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                whiteSpace: 'nowrap'
-              }}
-            >
-              <CheckCircle2 size={13} />
-              <span>{f.name.length > 20 ? f.name.substring(0, 18) + '...' : f.name}</span>
-            </button>
-          ))}
+          <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', alignItems: 'center' }}>
+            {files.map((f, i) => (
+              <div
+                key={f.id}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  borderRadius: 'var(--radius-full)',
+                  border: '1px solid',
+                  borderColor: i === activeFileIndex ? 'var(--primary-green)' : 'var(--border-subtle)',
+                  backgroundColor: i === activeFileIndex ? 'var(--primary-green)' : '#FFFFFF',
+                  color: i === activeFileIndex ? '#FFFFFF' : 'var(--color-body)',
+                  padding: '2px 4px 2px 10px',
+                  gap: '4px',
+                  transition: 'all var(--transition-fast)'
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => onSelectFileIndex(i)}
+                  style={{
+                    fontSize: '0.82rem',
+                    fontWeight: 600,
+                    background: 'none',
+                    border: 'none',
+                    color: 'inherit',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    whiteSpace: 'nowrap',
+                    padding: '4px 0'
+                  }}
+                >
+                  <CheckCircle2 size={13} />
+                  <span>{f.name.length > 20 ? f.name.substring(0, 18) + '...' : f.name}</span>
+                </button>
+
+                {onRemoveFile && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onRemoveFile(i);
+                    }}
+                    style={{
+                      border: 'none',
+                      background: i === activeFileIndex ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.06)',
+                      color: 'inherit',
+                      borderRadius: '50%',
+                      width: 18,
+                      height: 18,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginLeft: 2
+                    }}
+                    title={`Remove ${f.name}`}
+                    aria-label={`Remove ${f.name}`}
+                  >
+                    <X size={11} />
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <button
+            type="button"
+            onClick={onReset}
+            style={{
+              fontSize: '0.78rem',
+              fontWeight: 600,
+              color: '#DC2626',
+              backgroundColor: '#FEE2E2',
+              border: '1px solid #FECACA',
+              borderRadius: 'var(--radius-full)',
+              padding: '4px 12px',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4
+            }}
+            title="Reset all files and return to upload"
+          >
+            <Trash2 size={12} />
+            <span>Reset All</span>
+          </button>
         </div>
       )}
 
@@ -139,7 +210,7 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
           </div>
         </div>
 
-        <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
           {isPass ? (
             <div className="status-badge-pass">
               <Check size={16} strokeWidth={3} />
@@ -151,6 +222,28 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
               <span>Status: {currentDoc.status.toUpperCase()}</span>
             </div>
           )}
+
+          {/* Quick Reset / Verify Another Button */}
+          <button
+            type="button"
+            className="header-reset-action-btn"
+            onClick={onReset}
+            title="Reset this file and verify another document"
+          >
+            <RotateCcw size={14} />
+            <span>Verify Another</span>
+          </button>
+
+          {/* Cross (X) Close / Reset Button */}
+          <button
+            type="button"
+            className="card-close-x-btn"
+            onClick={onReset}
+            title="Close and verify another PDF"
+            aria-label="Close and reset to upload"
+          >
+            <X size={18} />
+          </button>
         </div>
       </div>
 
@@ -409,10 +502,11 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
               type="button"
               className="secondary-action-btn"
               onClick={onReset}
-              style={{ color: 'var(--color-muted)' }}
+              style={{ color: '#DC2626', borderColor: '#FECACA', backgroundColor: '#FEF2F2' }}
+              title="Reset current verified file and verify another document"
             >
-              <RefreshCw size={15} />
-              <span>Validate Another Document</span>
+              <RotateCcw size={15} />
+              <span>Verify Another PDF (Reset)</span>
             </button>
           </div>
 

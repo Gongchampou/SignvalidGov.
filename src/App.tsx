@@ -148,6 +148,17 @@ export const App: React.FC = () => {
     scrollToValidate();
   };
 
+  const handleRemoveFile = (index: number) => {
+    setValidatedFiles(prev => {
+      const next = prev.filter((_, i) => i !== index);
+      if (next.length === 0) {
+        scrollToValidate();
+      }
+      return next;
+    });
+    setActiveFileIndex(prev => Math.max(0, prev >= index ? prev - 1 : prev));
+  };
+
   return (
     <div className="app-layout">
       {/* Toast Notification Layer */}
@@ -172,6 +183,7 @@ export const App: React.FC = () => {
           onSelectFileIndex={setActiveFileIndex}
           onOpenReportModal={(file) => setReportModalFile(file)}
           onReset={handleReset}
+          onRemoveFile={handleRemoveFile}
           isProcessing={isProcessing}
           processingProgress={processingProgress}
           processingStep={processingStep}
