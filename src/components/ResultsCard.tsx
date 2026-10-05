@@ -16,6 +16,7 @@ import {
 import type { ValidatedFile } from '../types';
 import { generateValidatedPdf } from '../utils/pdfGenerator';
 import { createGreenTickCopy, downloadBytes, PasswordRequiredError } from '../verify/stampPdf';
+import { PdfLivePreview } from './PdfLivePreview';
 
 interface ResultsCardProps {
   files: ValidatedFile[];
@@ -210,7 +211,7 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+        <div className="results-header-actions">
           {isPass ? (
             <div className="status-badge-pass">
               <Check size={16} strokeWidth={3} />
@@ -247,9 +248,16 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
         </div>
       </div>
 
+      {/* Live Interactive Document Preview */}
+      <PdfLivePreview
+        file={currentDoc}
+        password={passwordInput}
+        onDownloadStamped={() => handleDownloadStampedPdf(passwordInput)}
+      />
+
       {/* Interactive Visual Comparison: Adobe vs SignValid Universal */}
       <div className="preview-comparison-box">
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+        <div className="preview-comparison-header">
           <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-heading)' }}>
             VISUAL SIGNATURE TRANSFORMATION
           </span>
@@ -273,10 +281,10 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
           </div>
         </div>
 
-        <div className="stamp-preview-display" style={{ padding: '20px 24px', backgroundColor: '#FFFFFF', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-subtle)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+        <div className="stamp-preview-display">
           {previewTab === 'universal' ? (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, flexWrap: 'wrap' }}>
-              <div style={{ flex: 1, minWidth: 260 }}>
+              <div className="stamp-preview-content">
                 <div style={{ fontSize: '1.28rem', fontWeight: 700, color: '#111827', fontFamily: 'serif, Georgia, "Times New Roman"', marginBottom: 6 }}>
                   Signature valid
                 </div>
@@ -294,7 +302,7 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
                 </div>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+              <div className="stamp-preview-graphic">
                 {/* Authentic Adobe 3D green checkmark SVG with black drop shadow */}
                 <svg width="78" height="78" viewBox="0 0 100 100" style={{ filter: 'drop-shadow(2px 3px 0px #000000)' }}>
                   <path
@@ -312,7 +320,7 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
             </div>
           ) : (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, flexWrap: 'wrap' }}>
-              <div style={{ flex: 1, minWidth: 260 }}>
+              <div className="stamp-preview-content">
                 <div style={{ fontSize: '1.15rem', fontWeight: 700, color: '#B45309', marginBottom: 6 }}>
                   Validity Unknown · Signature Not Verified
                 </div>
@@ -327,7 +335,7 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
                 </div>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+              <div className="stamp-preview-graphic">
                 <div style={{
                   width: 64,
                   height: 64,
@@ -355,14 +363,7 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
 
       {/* Password Prompt if Encrypted */}
       {showPasswordPrompt && (
-        <div style={{
-          backgroundColor: '#FFFBEB',
-          borderBottom: '1px solid #FCD34D',
-          padding: '16px 28px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '10px'
-        }}>
+        <div className="password-prompt-box">
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#B45309', fontWeight: 600, fontSize: '0.9rem' }}>
             <Key size={16} />
             <span>PDF Password Required</span>
@@ -370,7 +371,7 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
           <p style={{ fontSize: '0.82rem', color: '#92400E' }}>
             {stampError || 'This document is protected with a password (e.g. e-Aadhaar password is first 4 letters of name in CAPITAL + year of birth).'}
           </p>
-          <div style={{ display: 'flex', gap: 10, maxWidth: 420 }}>
+          <div className="password-input-row">
             <input
               type="password"
               placeholder="Enter document password"
@@ -462,9 +463,9 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
 
       {/* Action CTAs Bar */}
       <div className="results-actions-bar">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%' }}>
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+        <div className="results-actions-wrapper">
+          <div className="results-actions-group">
+            <div className="results-actions-primary-btns">
               {/* PRIMARY BUTTON: Downloads the user's actual PDF with the green checkmark stamped! */}
               <button
                 type="button"
@@ -510,8 +511,8 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
             </button>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.78rem', color: 'var(--color-muted)', paddingLeft: 4 }}>
-            <CheckCircle2 size={13} style={{ color: 'var(--primary-green)' }} />
+          <div className="results-actions-hint">
+            <CheckCircle2 size={13} style={{ color: 'var(--primary-green)', flexShrink: 0 }} />
             <span>
               <strong>Primary Download:</strong> Exports your actual original document (<em>{currentDoc.name.replace(/\.pdf$/i, '')}_verified.pdf</em>) with all pages preserved and the unverified '?' replaced with a permanent green checkmark.
             </span>

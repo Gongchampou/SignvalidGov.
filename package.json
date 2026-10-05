@@ -15,6 +15,7 @@
     "canvas-confetti": "^1.9.4",
     "jspdf": "^4.2.1",
     "lucide-react": "^1.52.0",
+    "pdfjs-dist": "^6.4.299",
     "pkijs": "^3.4.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"

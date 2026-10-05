@@ -85,7 +85,9 @@ export const ReportModal: React.FC<ReportModalProps> = ({
             marginBottom: '24px',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: 12
           }}>
             <div>
               <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--primary-green)' }}>
@@ -111,15 +113,15 @@ export const ReportModal: React.FC<ReportModalProps> = ({
                 <tbody>
                   <tr style={{ borderBottom: '1px solid var(--border-subtle)' }}>
                     <td style={{ padding: '8px 0', color: 'var(--color-muted)', width: '35%' }}>Document Name</td>
-                    <td style={{ padding: '8px 0', fontWeight: 600 }}>{file.name}</td>
+                    <td style={{ padding: '8px 0', fontWeight: 600, wordBreak: 'break-word' }}>{file.name}</td>
                   </tr>
                   <tr style={{ borderBottom: '1px solid var(--border-subtle)' }}>
                     <td style={{ padding: '8px 0', color: 'var(--color-muted)' }}>Classification</td>
-                    <td style={{ padding: '8px 0', fontWeight: 600 }}>{meta.documentType}</td>
+                    <td style={{ padding: '8px 0', fontWeight: 600, wordBreak: 'break-word' }}>{meta.documentType}</td>
                   </tr>
                   <tr style={{ borderBottom: '1px solid var(--border-subtle)' }}>
                     <td style={{ padding: '8px 0', color: 'var(--color-muted)' }}>Signer Common Name</td>
-                    <td style={{ padding: '8px 0', fontWeight: 600 }}>{meta.signerIdentity}</td>
+                    <td style={{ padding: '8px 0', fontWeight: 600, wordBreak: 'break-word' }}>{meta.signerIdentity}</td>
                   </tr>
                   <tr style={{ borderBottom: '1px solid var(--border-subtle)' }}>
                     <td style={{ padding: '8px 0', color: 'var(--color-muted)' }}>Signing Time</td>
@@ -167,13 +169,15 @@ export const ReportModal: React.FC<ReportModalProps> = ({
                     fontSize: '0.82rem',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'space-between'
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: 8
                   }}>
-                    <div>
+                    <div style={{ wordBreak: 'break-word', minWidth: 0 }}>
                       <strong style={{ color: 'var(--primary-green)', marginRight: 6 }}>Level {i + 1}:</strong>
                       <span>{chain}</span>
                     </div>
-                    <span style={{ fontSize: '0.72rem', color: 'var(--success-text)', fontWeight: 700 }}>
+                    <span style={{ fontSize: '0.72rem', color: 'var(--success-text)', fontWeight: 700, flexShrink: 0 }}>
                       VERIFIED
                     </span>
                   </div>
@@ -206,9 +210,9 @@ export const ReportModal: React.FC<ReportModalProps> = ({
         </div>
 
         {showPasswordPrompt && (
-          <div style={{ backgroundColor: '#FFFBEB', padding: '12px 24px', borderTop: '1px solid #FCD34D', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div className="password-prompt-box">
             <span style={{ fontSize: '0.82rem', color: '#92400E', fontWeight: 600 }}>Enter Document Password to Apply Green Tick:</span>
-            <div style={{ display: 'flex', gap: 8 }}>
+            <div className="password-input-row">
               <input
                 type="password"
                 placeholder="Password"
@@ -235,7 +239,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({
           </div>
         )}
 
-        <div className="modal-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
+        <div className="modal-footer">
           <button
             type="button"
             className="secondary-action-btn"

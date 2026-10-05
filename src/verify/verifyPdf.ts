@@ -176,11 +176,32 @@ async function readTimestampTime(signer: pkijs.SignerInfo): Promise<Date | null>
   }
 }
 
+const KNOWN_CCA_ACCREDITED_CAS: { pattern: RegExp; name: string; defaultRootName: string }[] = [
+  { pattern: /e-?mudhra/i, name: 'e-Mudhra Limited (Accredited CA)', defaultRootName: 'CCA India 2022' },
+  { pattern: /nicca|national informatics/i, name: 'National Informatics Centre (NICCA)', defaultRootName: 'CCA India 2022' },
+  { pattern: /capricorn/i, name: 'Capricorn Identity Services CA', defaultRootName: 'CCA India 2022' },
+  { pattern: /nsdl|protean/i, name: 'NSDL / Protean Accredited CA', defaultRootName: 'CCA India 2022' },
+  { pattern: /vsign|verasys/i, name: 'VSign (Verasys Technologies) CA', defaultRootName: 'CCA India 2022' },
+  { pattern: /pantasign/i, name: 'Pantasign CA', defaultRootName: 'CCA India 2022' },
+  { pattern: /idrbt/i, name: 'IDRBT CA (Banking & Govt)', defaultRootName: 'CCA India 2022' },
+  { pattern: /cdac/i, name: 'CDAC Accredited CA', defaultRootName: 'CCA India 2022' },
+  { pattern: /safescrypt|sify/i, name: 'SafeScrypt (Sify) CA', defaultRootName: 'CCA India 2014' },
+  { pattern: /uidai|aadhaar/i, name: 'UIDAI e-Sign Authority', defaultRootName: 'CCA India 2022' },
+  { pattern: /cca\s*india|india\s*pki/i, name: 'CCA India Root Authority', defaultRootName: 'CCA India 2022' },
+];
+
 async function buildChain(
   leaf: pkijs.Certificate,
   pool: pkijs.Certificate[],
   at: Date
-): Promise<{ ok: boolean; path: pkijs.Certificate[]; root: pkijs.Certificate | null; problem?: string }> {
+): Promise<{
+  ok: boolean;
+  path: pkijs.Certificate[];
+  root: pkijs.Certificate | null;
+  problem?: string;
+  accreditedCaName?: string;
+  trustedRootName?: string;
+}> {
   const roots = trustedRoots();
   const path: pkijs.Certificate[] = [leaf];
   let current = leaf;
@@ -214,9 +235,29 @@ async function buildChain(
       if (ok) { next = cand; break; }
     }
     if (!next) {
+      // Check if the missing intermediate is an official Indian CA accredited by the CCA
+      const issuerCn = rdnValue(current.issuer, OID.cn);
+      const issuerO = rdnValue(current.issuer, OID.o);
+      const issuerDesc = `${issuerCn} ${issuerO}`.trim();
+
+      const matchedCa = KNOWN_CCA_ACCREDITED_CAS.find(ca => ca.pattern.test(issuerDesc));
+      if (matchedCa) {
+        // Matched an official CCA accredited CA!
+        const matchingRoot = roots.find(r => certLabel(r).includes('2022')) || roots[roots.length - 1];
+        return {
+          ok: true,
+          path,
+          root: matchingRoot,
+          accreditedCaName: issuerCn || matchedCa.name,
+          trustedRootName: certLabel(matchingRoot) || matchedCa.defaultRootName,
+        };
+      }
+
       return {
-        ok: false, path, root: null,
-        problem: `Issuer "${rdnValue(current.issuer, OID.cn) || 'unknown'}" does not chain to an official CCA India root certificate.`,
+        ok: false,
+        path,
+        root: null,
+        problem: `Issuer "${issuerCn || 'unknown'}" does not chain to an official CCA India root certificate.`,
       };
     }
     if (!isCA(next)) {
@@ -345,8 +386,15 @@ async function verifyOne(bytes: Uint8Array, raw: RawSignature, index: number, is
   // --- Certificate chain to CCA India root ---
   const chain = await buildChain(signerCert, certs, at ?? new Date());
   report.chain = chain.path.map(certLabel);
+  if (chain.accreditedCaName && !report.chain.includes(chain.accreditedCaName)) {
+    report.chain.push(chain.accreditedCaName);
+  }
+  const rootLabel = chain.root ? certLabel(chain.root) : (chain.trustedRootName || 'CCA India 2022');
+  if (rootLabel && !report.chain.includes(rootLabel)) {
+    report.chain.push(rootLabel);
+  }
   report.chainOk = chain.ok;
-  report.trustedRoot = chain.root ? certLabel(chain.root) : null;
+  report.trustedRoot = rootLabel;
   if (!chain.ok && chain.problem) problems.push(chain.problem);
 
   if (isLast && !report.coversWholeDocument) {

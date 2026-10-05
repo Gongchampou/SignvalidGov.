@@ -37,12 +37,7 @@ export const StatsModal: React.FC<StatsModalProps> = ({ onClose }) => {
 
         <div className="modal-body">
           {/* Top Big Number Summary */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: 16,
-            marginBottom: 24
-          }}>
+          <div className="stats-summary-grid">
             <div style={{ backgroundColor: 'var(--mint-bg)', border: '1px solid var(--mint-border)', borderRadius: 'var(--radius-lg)', padding: '16px', textAlign: 'center' }}>
               <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--primary-green)' }}>
                 49,550+
@@ -103,7 +98,7 @@ export const StatsModal: React.FC<StatsModalProps> = ({ onClose }) => {
               <MapPin size={16} />
               <span>Leading State Portals Validated</span>
             </h4>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, fontSize: '0.82rem' }}>
+            <div className="stats-states-grid">
               <div style={{ padding: '8px 12px', background: 'var(--bg-subtle)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
                 <strong>Karnataka</strong>: Seva Sindhu (7,420+)
               </div>
