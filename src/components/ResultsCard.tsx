@@ -180,55 +180,82 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
           </div>
         </div>
 
-        <div className="stamp-preview-display">
+        <div className="stamp-preview-display" style={{ padding: '20px 24px', backgroundColor: '#FFFFFF', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-subtle)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
           {previewTab === 'universal' ? (
-            <>
-              <div className="stamp-box-styled">
-                <div className="stamp-icon-large valid">
-                  ✓
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, flexWrap: 'wrap' }}>
+              <div style={{ flex: 1, minWidth: 260 }}>
+                <div style={{ fontSize: '1.28rem', fontWeight: 700, color: '#111827', fontFamily: 'serif, Georgia, "Times New Roman"', marginBottom: 6 }}>
+                  Signature valid
                 </div>
-                <div>
-                  <div className="stamp-text-title" style={{ color: 'var(--success-text)' }}>
-                    Signature Valid · Verified by SignValid
-                  </div>
-                  <div className="stamp-text-desc">
-                    Digitally signed by <strong>{meta.signerIdentity}</strong>
-                  </div>
-                  <div style={{ fontSize: '0.78rem', color: 'var(--color-muted)', marginTop: 2 }}>
-                    CA: {meta.certificateAuthority} · Timestamp: {meta.timestamp}
-                  </div>
+                <div style={{ fontSize: '0.85rem', color: '#1F2937', lineHeight: 1.5 }}>
+                  Digitally signed by <strong>{meta.signerIdentity}</strong>
+                </div>
+                <div style={{ fontSize: '0.82rem', color: '#374151', lineHeight: 1.5 }}>
+                  Date: {meta.timestamp}
+                </div>
+                <div style={{ fontSize: '0.80rem', color: '#4B5563', lineHeight: 1.5 }}>
+                  Reason: Permanent Resident / Digital Verification
+                </div>
+                <div style={{ fontSize: '0.78rem', color: '#6B7280', lineHeight: 1.5 }}>
+                  Location: India · CCA Root Accredited
                 </div>
               </div>
-              <div style={{ textAlign: 'right' }}>
-                <span className="state-pill valid" style={{ fontSize: '0.78rem' }}>
-                  ✓ Yellow "?" replaced with green tick
+
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                {/* Authentic Adobe 3D green checkmark SVG with black drop shadow */}
+                <svg width="78" height="78" viewBox="0 0 100 100" style={{ filter: 'drop-shadow(2px 3px 0px #000000)' }}>
+                  <path
+                    d="M 36 8 L 5 44 L 17 56 L 37 32 L 83 94 L 97 80 Z"
+                    fill="#00A651"
+                    stroke="#000000"
+                    strokeWidth="1.6"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                <span className="state-pill valid" style={{ fontSize: '0.74rem' }}>
+                  ✓ Authentic Adobe-style tick
                 </span>
               </div>
-            </>
+            </div>
           ) : (
-            <>
-              <div className="stamp-box-styled">
-                <div className="stamp-icon-large unknown">
-                  ?
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, flexWrap: 'wrap' }}>
+              <div style={{ flex: 1, minWidth: 260 }}>
+                <div style={{ fontSize: '1.15rem', fontWeight: 700, color: '#B45309', marginBottom: 6 }}>
+                  Validity Unknown · Signature Not Verified
                 </div>
-                <div>
-                  <div className="stamp-text-title" style={{ color: 'var(--warning-text)' }}>
-                    Validity Unknown · Signature Not Verified
-                  </div>
-                  <div className="stamp-text-desc">
-                    Adobe Reader warning triggered by missing Indian CCA Root in standard default AATL store.
-                  </div>
-                  <div style={{ fontSize: '0.78rem', color: 'var(--color-muted)', marginTop: 2 }}>
-                    Original file shows confusing yellow question mark on phones and printouts.
-                  </div>
+                <div style={{ fontSize: '0.85rem', color: '#374151', lineHeight: 1.5 }}>
+                  Digitally signed by <strong>{meta.signerIdentity}</strong>
+                </div>
+                <div style={{ fontSize: '0.82rem', color: '#4B5563', lineHeight: 1.5 }}>
+                  Date: {meta.timestamp}
+                </div>
+                <div style={{ fontSize: '0.76rem', color: '#92400E', marginTop: 4, fontStyle: 'italic' }}>
+                  Missing Indian CCA root anchor in default Adobe AATL store causes Adobe Reader to display a yellow question mark.
                 </div>
               </div>
-              <div style={{ textAlign: 'right' }}>
-                <span className="state-pill unknown" style={{ fontSize: '0.78rem' }}>
+
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                <div style={{
+                  width: 64,
+                  height: 64,
+                  borderRadius: '50%',
+                  backgroundColor: '#FEF3C7',
+                  border: '2.5px solid #F59E0B',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '2.2rem',
+                  fontWeight: 'bold',
+                  color: '#B45309',
+                  boxShadow: '0 2px 6px rgba(245, 158, 11, 0.2)'
+                }}>
+                  ?
+                </div>
+                <span className="state-pill unknown" style={{ fontSize: '0.74rem' }}>
                   ? Unverified question mark
                 </span>
               </div>
-            </>
+            </div>
           )}
         </div>
       </div>

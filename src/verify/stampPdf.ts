@@ -21,25 +21,91 @@ export class PasswordRequiredError extends Error {
 
 const N = (s: string) => PDFName.of(s);
 
-// Green tick polygon in a unit square (x right, y up).
-const TICK: [number, number][] = [[0.04, 0.52], [0.19, 0.67], [0.40, 0.46], [0.81, 0.90], [0.96, 0.75], [0.40, 0.16]];
-const GREEN: [number, number, number] = [0.07, 0.55, 0.28]; // #126B44
-const GREEN_FILL: [number, number, number] = [0.86, 0.99, 0.92]; // #DCFCE7
-const OUTLINE: [number, number, number] = [0.05, 0.42, 0.21];
+// Normalized points for authentic Adobe Acrobat signature green checkmark.
+// Unit square [0, 1] x [0, 1], with (0,0) at bottom-left and (1,1) at top-right.
+const TICK_POINTS: [number, number][] = [
+  [0.36, 0.08], // bottom crook vertex
+  [0.05, 0.44], // short arm outer tip
+  [0.17, 0.56], // short arm inner tip
+  [0.37, 0.32], // inner elbow
+  [0.83, 0.94], // long arm inner tip
+  [0.97, 0.80], // long arm outer tip
+];
 
-function tickPath(x: number, y: number, w: number, h: number, fraction: number) {
-  const s = Math.min(w, h) * fraction;
-  const ox = x + (w - s) / 2;
-  const oy = y + (h - s) / 2;
-  return { pts: TICK.map(([px, py]) => [ox + px * s, oy + py * s] as [number, number]), size: s };
+function tickContent(x: number, y: number, w: number, h: number): string {
+  const size = Math.min(w, h) * 0.92;
+  const ox = x + (w - size) / 2;
+  const oy = y + (h - size) / 2;
+
+  const pts = TICK_POINTS.map(([px, py]) => [ox + px * size, oy + py * size] as [number, number]);
+  const f = (n: number) => n.toFixed(3);
+
+  // Black 3D drop shadow offset (shifted down and right) matching authentic Adobe Acrobat
+  const shadowDx = size * 0.055;
+  const shadowDy = size * 0.055;
+  const shadowPts = pts.map(([px, py]) => [px + shadowDx, py - shadowDy] as [number, number]);
+
+  const shadowPath = shadowPts.map(([px, py], i) => `${f(px)} ${f(py)} ${i === 0 ? 'm' : 'l'}`).join('\n');
+  const tickPath = pts.map(([px, py], i) => `${f(px)} ${f(py)} ${i === 0 ? 'm' : 'l'}`).join('\n');
+
+  const strokeW = Math.max(0.6, size * 0.025);
+
+  return [
+    'q',
+    // 1. Black 3D drop shadow (solid fill + stroke)
+    '0 0 0 rg',
+    '0 0 0 RG',
+    `${f(strokeW * 1.5)} w`,
+    '1 j 1 J',
+    shadowPath,
+    'h',
+    'B',
+    'Q',
+    'q',
+    // 2. Vivid Adobe signature green with crisp black edge (#00A651)
+    '0 0.65 0.31 rg',
+    '0 0 0 RG',
+    `${f(strokeW)} w`,
+    '1 j 1 J',
+    tickPath,
+    'h',
+    'B',
+    'Q\n'
+  ].join('\n');
 }
 
-/** Content-stream text that draws a green tick filling the given box. */
-function tickContent(x: number, y: number, w: number, h: number): string {
-  const { pts, size } = tickPath(x, y, w, h, 0.9);
-  const f = (n: number) => n.toFixed(3);
-  const path = pts.map(([px, py], i) => `${f(px)} ${f(py)} ${i === 0 ? 'm' : 'l'}`).join('\n');
-  return `q\n${GREEN.join(' ')} rg\n${OUTLINE.join(' ')} RG\n${f(Math.max(0.5, size * 0.03))} w\n1 j\n${path}\nh\nB\nQ\n`;
+/** Vector drawing helper for fallback or sample document pages */
+function drawTickWithShadow(page: PDFPage, tx: number, ty: number, size: number) {
+  const pts = TICK_POINTS.map(([px, py]) => [tx + px * size, ty + py * size] as [number, number]);
+  const shadowDx = size * 0.055;
+  const shadowDy = size * 0.055;
+  const shadowPts = pts.map(([px, py]) => [px + shadowDx, py - shadowDy] as [number, number]);
+
+  // Black 3D drop shadow
+  page.pushOperators(
+    pushGraphicsState(),
+    setFillingRgbColor(0, 0, 0),
+    setStrokingRgbColor(0, 0, 0),
+    setLineWidth(Math.max(0.6, size * 0.035)),
+    moveTo(shadowPts[0][0], shadowPts[0][1]),
+    ...shadowPts.slice(1).map(([px, py]) => lineTo(px, py)),
+    closePath(),
+    fillAndStroke(),
+    popGraphicsState()
+  );
+
+  // Adobe signature green with thin black edge
+  page.pushOperators(
+    pushGraphicsState(),
+    setFillingRgbColor(0, 0.65, 0.31),
+    setStrokingRgbColor(0, 0, 0),
+    setLineWidth(Math.max(0.4, size * 0.02)),
+    moveTo(pts[0][0], pts[0][1]),
+    ...pts.slice(1).map(([px, py]) => lineTo(px, py)),
+    closePath(),
+    fillAndStroke(),
+    popGraphicsState()
+  );
 }
 
 function numbers(arr: PDFArray | undefined, fallback: number[]): number[] {
@@ -75,9 +141,9 @@ const toLatin1Bytes = (s: string) => Uint8Array.from(s, ch => ch.charCodeAt(0) &
 
 /**
  * Walk an appearance stream and its nested form XObjects.
- * - Replaces the Adobe validity layer "n1" (the "?") with a green tick.
+ * - Replaces layer "n1" (the "?") and "n2" (valid layer) with Adobe's 3D-shadow green tick.
  * - Clears layer "n3" (the red X / invalid layer).
- * - Rewrites literal text "(Signature Not Verified)" -> "(Signature Verified)".
+ * - Rewrites literal text "(Signature Not Verified)" / "(Validity Unknown)" -> "(Signature valid)".
  */
 function rewriteAppearance(context: PDFContext, ref: PDFRef, depth = 0, seen = new Set<string>()): boolean {
   if (depth > 5 || seen.has(ref.toString())) return false;
@@ -85,20 +151,26 @@ function rewriteAppearance(context: PDFContext, ref: PDFRef, depth = 0, seen = n
 
   const stream = context.lookup(ref);
   if (!(stream instanceof PDFStream)) return false;
-  let foundN1 = false;
+  let modified = false;
 
   try {
     const text = latin1.decode(streamBytes(stream));
     const replaced = text
-      .replace(/\(Signature\s+Not\s+Verified\)/gi, '(Signature Verified)')
-      .replace(/\(Validity\s+Unknown\)/gi, '(Signature Valid)');
-    if (replaced !== text) replaceStream(context, ref, stream.dict, toLatin1Bytes(replaced));
+      .replace(/\(Signature\s+Not\s+Verified\)/gi, '(Signature valid)')
+      .replace(/\(Signature\s+not\s+verified\)/gi, '(Signature valid)')
+      .replace(/\(Signature\s+Verified\)/gi, '(Signature valid)')
+      .replace(/\(Validity\s+Unknown\)/gi, '(Signature valid)')
+      .replace(/\(validity\s+unknown\)/gi, '(Signature valid)');
+    if (replaced !== text) {
+      replaceStream(context, ref, stream.dict, toLatin1Bytes(replaced));
+      modified = true;
+    }
   } catch { /* undecodable filter */ }
 
   const current = context.lookup(ref) as PDFStream;
   const resources = current.dict.lookupMaybe(N('Resources'), PDFDict);
   const xobjects = resources?.lookupMaybe(N('XObject'), PDFDict);
-  if (!xobjects) return false;
+  if (!xobjects) return modified;
 
   for (const [name, value] of xobjects.entries()) {
     if (!(value instanceof PDFRef)) continue;
@@ -106,17 +178,20 @@ function rewriteAppearance(context: PDFContext, ref: PDFRef, depth = 0, seen = n
     if (!(layer instanceof PDFStream)) continue;
     const key = name.asString();
 
-    if (key === '/n1') {
+    if (key === '/n1' || key === '/n2') {
       const [x0, y0, x1, y1] = numbers(layer.dict.lookupMaybe(N('BBox'), PDFArray), [0, 0, 100, 100]);
-      replaceStream(context, value, layer.dict, toLatin1Bytes(tickContent(Math.min(x0, x1), Math.min(y0, y1), Math.abs(x1 - x0), Math.abs(y1 - y0))));
-      foundN1 = true;
+      const w = Math.abs(x1 - x0), h = Math.abs(y1 - y0);
+      const minX = Math.min(x0, x1), minY = Math.min(y0, y1);
+      replaceStream(context, value, layer.dict, toLatin1Bytes(tickContent(minX, minY, w, h)));
+      modified = true;
     } else if (key === '/n3') {
       replaceStream(context, value, layer.dict, new Uint8Array());
+      modified = true;
     } else if (rewriteAppearance(context, value, depth + 1, seen)) {
-      foundN1 = true;
+      modified = true;
     }
   }
-  return foundN1;
+  return modified;
 }
 
 function isSigField(dict: PDFDict): boolean {
@@ -130,41 +205,8 @@ function isSigField(dict: PDFDict): boolean {
   return false;
 }
 
-/** Draw a green tick badge over a rectangular box */
-function drawGreenTickBadge(page: PDFPage, x: number, y: number, w: number, h: number) {
-  const size = Math.min(w, h);
-  const cx = x + w / 2;
-  const cy = y + h / 2;
-  const radius = (size / 2) * 0.95;
-
-  // Solid white/mint background circle to cover any underlying '?' icon
-  page.drawCircle({
-    x: cx,
-    y: cy,
-    size: radius,
-    color: rgb(GREEN_FILL[0], GREEN_FILL[1], GREEN_FILL[2]),
-    borderColor: rgb(GREEN[0], GREEN[1], GREEN[2]),
-    borderWidth: 1.5,
-  });
-
-  // Green tick inside
-  const tickBox = radius * 1.3;
-  const { pts } = tickPath(cx - tickBox / 2, cy - tickBox / 2, tickBox, tickBox, 0.85);
-  page.pushOperators(
-    pushGraphicsState(),
-    setFillingRgbColor(GREEN[0], GREEN[1], GREEN[2]),
-    setStrokingRgbColor(OUTLINE[0], OUTLINE[1], OUTLINE[2]),
-    setLineWidth(Math.max(0.5, tickBox * 0.04)),
-    moveTo(pts[0][0], pts[0][1]),
-    ...pts.slice(1).map(([px, py]) => lineTo(px, py)),
-    closePath(),
-    fillAndStroke(),
-    popGraphicsState()
-  );
-}
-
-/** Draw a widget's appearance onto the page at its /Rect (flattening) and overlay the green tick. */
-function flattenWidget(page: PDFPage, context: PDFContext, widget: PDFDict) {
+/** Flatten a widget's rewritten appearance onto the page at its /Rect. */
+function flattenWidget(page: PDFPage, context: PDFContext, widget: PDFDict): boolean {
   const [r0, r1, r2, r3] = numbers(widget.lookupMaybe(N('Rect'), PDFArray), [0, 0, 0, 0]);
   const rx = Math.min(r0, r2), ry = Math.min(r1, r3), rw = Math.abs(r2 - r0), rh = Math.abs(r3 - r1);
   const flags = (widget.lookupMaybe(N('F'), PDFNumber)?.asNumber() ?? 0);
@@ -175,7 +217,7 @@ function flattenWidget(page: PDFPage, context: PDFContext, widget: PDFDict) {
   if (apRef && !(apRef instanceof PDFRef)) apRef = context.register(apRef as PDFObject);
   const apStream = apRef ? context.lookup(apRef) : undefined;
 
-  // Render original appearance first
+  // Render rewritten original appearance onto the page
   if (apRef instanceof PDFRef && apStream instanceof PDFStream) {
     const dict = apStream.dict;
     if (!dict.get(N('Subtype'))) dict.set(N('Subtype'), N('Form'));
@@ -195,19 +237,10 @@ function flattenWidget(page: PDFPage, context: PDFContext, widget: PDFDict) {
       drawObject(name),
       popGraphicsState()
     );
+    return true;
   }
 
-  // Draw the green tick badge OVER the question mark area!
-  // If the signature box is wide (aspect ratio > 1.25, like e-Aadhaar), the icon is on the left side.
-  // Otherwise, the icon is in the center.
-  if (rw > rh * 1.25) {
-    const iconSide = Math.min(rh * 0.9, rw * 0.35);
-    drawGreenTickBadge(page, rx + 2, ry + (rh - iconSide) / 2, iconSide, iconSide);
-  } else {
-    drawGreenTickBadge(page, rx, ry, rw, rh);
-  }
-
-  return true;
+  return false;
 }
 
 async function loadDecrypted(file: ValidatedFile, password?: string): Promise<PDFDocument> {
@@ -227,11 +260,12 @@ async function loadDecrypted(file: ValidatedFile, password?: string): Promise<PD
     page.drawText(`Timestamp: ${file.metadata.timestamp}`, { x: 50, y: 670, size: 11, font });
 
     // Draw sample signature box with green tick
-    page.drawRectangle({ x: 380, y: 100, width: 160, height: 60, borderColor: rgb(0.07, 0.55, 0.28), borderWidth: 1, color: rgb(0.96, 0.99, 0.97) });
-    drawGreenTickBadge(page, 385, 105, 50, 50);
-    page.drawText('Signature Valid', { x: 442, y: 138, size: 10, font: fontBold, color: rgb(0.07, 0.55, 0.28) });
-    page.drawText('Digitally signed', { x: 442, y: 124, size: 7.5, font, color: rgb(0.3, 0.3, 0.3) });
-    page.drawText(file.metadata.timestamp.substring(0, 20), { x: 442, y: 112, size: 6.5, font, color: rgb(0.4, 0.4, 0.4) });
+    page.drawRectangle({ x: 340, y: 80, width: 220, height: 75, borderColor: rgb(0.8, 0.8, 0.8), borderWidth: 0.8, color: rgb(1, 1, 1) });
+    page.drawText('Signature valid', { x: 350, y: 136, size: 13, font: fontBold, color: rgb(0, 0, 0) });
+    page.drawText(`Digitally signed by ${file.metadata.signerIdentity}`, { x: 350, y: 120, size: 7.5, font, color: rgb(0, 0, 0) });
+    page.drawText(`Date: ${file.metadata.timestamp}`, { x: 350, y: 107, size: 7.5, font, color: rgb(0, 0, 0) });
+    page.drawText(`CA: ${file.metadata.certificateAuthority.substring(0, 26)}`, { x: 350, y: 94, size: 7.5, font, color: rgb(0, 0, 0) });
+    drawTickWithShadow(page, 498, 92, 50);
 
     return demo;
   }
@@ -291,7 +325,7 @@ export async function createGreenTickCopy(file: ValidatedFile, password?: string
   if (pagesWithSig.size === 0 && doc.getPageCount() > 0) {
     const page0 = doc.getPage(0);
     const { width } = page0.getSize();
-    const bannerW = Math.min(220, width - 40);
+    const bannerW = Math.min(240, width - 40);
     const bannerH = 50;
     const bx = width - bannerW - 20;
     const by = 20;
@@ -301,20 +335,19 @@ export async function createGreenTickCopy(file: ValidatedFile, password?: string
       y: by,
       width: bannerW,
       height: bannerH,
-      borderColor: rgb(GREEN[0], GREEN[1], GREEN[2]),
-      borderWidth: 1.2,
-      color: rgb(0.96, 0.99, 0.97),
+      borderColor: rgb(0.8, 0.8, 0.8),
+      borderWidth: 0.8,
+      color: rgb(1, 1, 1),
     });
-
-    drawGreenTickBadge(page0, bx + 6, by + 5, 40, 40);
 
     const sig = file.signatures[0];
     const signerLabel = sig ? sig.signerName.substring(0, 24) : 'Authorized Signer';
     const caLabel = sig?.trustedRoot ? sig.trustedRoot.substring(0, 26) : 'CCA India 2014';
 
-    page0.drawText('Signature Valid', { x: bx + 52, y: by + 34, size: 9.5, font: fontBold, color: rgb(GREEN[0], GREEN[1], GREEN[2]) });
-    page0.drawText(`Signed by: ${signerLabel}`, { x: bx + 52, y: by + 22, size: 7, font, color: rgb(0.2, 0.2, 0.2) });
-    page0.drawText(`Verified against ${caLabel}`, { x: bx + 52, y: by + 11, size: 6.5, font, color: rgb(0.4, 0.4, 0.4) });
+    page0.drawText('Signature valid', { x: bx + 12, y: by + 34, size: 11, font: fontBold, color: rgb(0, 0, 0) });
+    page0.drawText(`Signed by: ${signerLabel}`, { x: bx + 12, y: by + 21, size: 7.5, font, color: rgb(0.2, 0.2, 0.2) });
+    page0.drawText(`Verified against ${caLabel}`, { x: bx + 12, y: by + 10, size: 7, font, color: rgb(0.4, 0.4, 0.4) });
+    drawTickWithShadow(page0, bx + bannerW - 46, by + 6, 38);
   }
 
   // Footer note on each page that had a signature
