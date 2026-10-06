@@ -5,7 +5,7 @@ export type NavPage = 'validate' | 'documents' | 'authorities' | 'how-it-works' 
 
 interface HeaderProps {
   currentPage: NavPage;
-  onNavigate: (page: NavPage) => void;
+  onNavigate: (page: NavPage, topic?: string) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -14,9 +14,9 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const handleNavClick = (page: NavPage) => {
+  const handleNavClick = (page: NavPage, topic?: string) => {
     setMobileMenuOpen(false);
-    onNavigate(page);
+    onNavigate(page, topic);
   };
 
   return (
@@ -31,7 +31,7 @@ export const Header: React.FC<HeaderProps> = ({
             title="Go to SignValid Home / Validator"
           >
             <div className="brand-logo-badge">
-              <Check size={22} strokeWidth={3} />
+              <Check size={18} strokeWidth={3} />
             </div>
             <div>
               <div className="brand-name">
@@ -39,7 +39,7 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
             </div>
             <div className="cca-tag">
-              <ShieldCheck size={13} />
+              <ShieldCheck size={12} />
               <span>CCA India 2014</span>
             </div>
           </div>
@@ -102,7 +102,7 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={() => handleNavClick('validate')}
             >
               <span>Validate PDF</span>
-              <ArrowRight size={16} />
+              <ArrowRight size={14} />
             </button>
           </nav>
 
@@ -113,7 +113,7 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle Menu"
           >
-            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
         </div>
 
@@ -180,7 +180,7 @@ export const Header: React.FC<HeaderProps> = ({
               style={{ textAlign: 'left', padding: '10px 12px', fontSize: '1rem', borderRadius: 8, backgroundColor: currentPage === 'about' ? 'var(--primary-green-subtle)' : 'transparent' }}
               onClick={() => handleNavClick('about')}
             >
-              About SignValid & Security
+              About
             </button>
             <button
               type="button"
@@ -195,29 +195,31 @@ export const Header: React.FC<HeaderProps> = ({
         )}
       </div>
 
-      {/* Red Running Privacy Ribbon Bar (Continuous Left-to-Right Stream) */}
-      <div className="red-privacy-ribbon" role="region" aria-label="100% Client-Side In-Memory Privacy Guarantee">
-        <div className="ribbon-ticker-track">
-          {[1, 2].map((set) => (
-            <div key={set} className="ribbon-ticker-group">
-              <span className="ribbon-badge">
-                <ShieldCheck size={13} style={{ display: 'inline', verticalAlign: '-2px', marginRight: 4 }} />
-                100% IN-MEMORY
-              </span>
-              <span className="ribbon-highlight">YOUR DETAILS NEVER RETAIN IN THIS SITE</span>
-              <span className="ribbon-bullet">◆</span>
-              <span>ZERO SERVER UPLOADS</span>
-              <span className="ribbon-bullet">◆</span>
-              <span>ALL VERIFICATION RUNS IN YOUR BROWSER RAM</span>
-              <span className="ribbon-bullet">◆</span>
-              <span>FILES ARE NEVER SAVED, STORED, OR TRANSMITTED</span>
-              <span className="ribbon-bullet">◆</span>
-              <span className="ribbon-highlight">COMPLETE PRIVACY GUARANTEED</span>
-              <span className="ribbon-bullet">◆</span>
-            </div>
-          ))}
+      {/* Red Running Privacy Ribbon Bar (Continuous Left-to-Right Stream) - hidden on About / Legal pages */}
+      {currentPage !== 'about' && (
+        <div className="red-privacy-ribbon" role="region" aria-label="100% Client-Side In-Memory Privacy Guarantee">
+          <div className="ribbon-ticker-track">
+            {[1, 2].map((set) => (
+              <div key={set} className="ribbon-ticker-group">
+                <span className="ribbon-badge">
+                  <ShieldCheck size={11} style={{ display: 'inline', verticalAlign: '-1px', marginRight: 3 }} />
+                  100% IN-MEMORY
+                </span>
+                <span className="ribbon-highlight">YOUR DETAILS NEVER RETAIN IN THIS SITE</span>
+                <span className="ribbon-bullet">◆</span>
+                <span>ZERO SERVER UPLOADS</span>
+                <span className="ribbon-bullet">◆</span>
+                <span>ALL VERIFICATION RUNS IN YOUR BROWSER RAM</span>
+                <span className="ribbon-bullet">◆</span>
+                <span>FILES ARE NEVER SAVED, STORED, OR TRANSMITTED</span>
+                <span className="ribbon-bullet">◆</span>
+                <span className="ribbon-highlight">COMPLETE PRIVACY GUARANTEED</span>
+                <span className="ribbon-bullet">◆</span>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </header>
   );
 };

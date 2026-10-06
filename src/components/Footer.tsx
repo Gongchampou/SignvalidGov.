@@ -111,17 +111,22 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             <h4 className="footer-col-title">About & Legal</h4>
             <ul className="footer-nav-list">
               <li>
-                <span className="footer-nav-link" onClick={() => onNavigate('about')}>
+                <span className="footer-nav-link" onClick={() => onNavigate('about', 'about')}>
                   About SignValid
                 </span>
               </li>
               <li>
-                <span className="footer-nav-link" onClick={() => onNavigate('about')}>
+                <span className="footer-nav-link" onClick={() => onNavigate('about', 'terms')}>
+                  Terms & Conditions
+                </span>
+              </li>
+              <li>
+                <span className="footer-nav-link" onClick={() => onNavigate('about', 'privacy')}>
                   Zero-Retention Privacy Guarantee
                 </span>
               </li>
               <li>
-                <span className="footer-nav-link" onClick={() => onNavigate('about')}>
+                <span className="footer-nav-link" onClick={() => onNavigate('about', 'about')}>
                   Information Technology Act 2000
                 </span>
               </li>
@@ -153,9 +158,9 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             © {new Date().getFullYear()} SignValid. Public interest cryptographic verification utility.
           </div>
           <div style={{ display: 'flex', gap: 16 }}>
-            <span style={{ cursor: 'pointer' }} onClick={() => onNavigate('about')}>Privacy Policy</span>
+            <span style={{ cursor: 'pointer' }} onClick={() => onNavigate('about', 'privacy')}>Privacy Policy</span>
             <span>•</span>
-            <span style={{ cursor: 'pointer' }} onClick={() => onNavigate('about')}>Terms of Service</span>
+            <span style={{ cursor: 'pointer' }} onClick={() => onNavigate('about', 'terms')}>Terms of Service</span>
             <span>•</span>
             <span style={{ cursor: 'pointer' }} onClick={() => onNavigate('faq')}>Help</span>
           </div>

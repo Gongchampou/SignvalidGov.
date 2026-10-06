@@ -9,7 +9,7 @@ import { HowItWorksPage } from './components/HowItWorksPage';
 import { GuidesPage } from './components/GuidesPage';
 import { FaqPage } from './components/FaqPage';
 import { AboutPage } from './components/AboutPage';
-import { PrivacyBanner } from './components/PrivacyBanner';
+import type { AboutSubTab } from './components/AboutPage';
 import { Footer } from './components/Footer';
 import { CookieBanner } from './components/CookieBanner';
 import { ReportModal } from './components/ReportModal';
@@ -23,12 +23,22 @@ export const App: React.FC = () => {
   // Navigation Page State with URL hash sync
   const [currentPage, setCurrentPage] = useState<NavPage>(() => {
     const hash = window.location.hash.replace('#/', '').replace('#', '');
-    if (['validate', 'documents', 'authorities', 'how-it-works', 'guides', 'faq', 'about'].includes(hash)) {
-      return hash as NavPage;
+    const [page] = hash.split('/');
+    if (page === 'terms' || page === 'privacy' || page === 'about') {
+      return 'about';
+    }
+    if (['validate', 'documents', 'authorities', 'how-it-works', 'guides', 'faq'].includes(page)) {
+      return page as NavPage;
     }
     return 'validate';
   });
   const [guidesInitialTopic, setGuidesInitialTopic] = useState<string>('adobe');
+  const [aboutInitialTab, setAboutInitialTab] = useState<AboutSubTab>(() => {
+    const hash = window.location.hash.replace('#/', '').replace('#', '');
+    if (hash === 'terms' || hash === 'about/terms') return 'terms';
+    if (hash === 'privacy' || hash === 'about/privacy') return 'privacy';
+    return 'about';
+  });
 
   // Files & Validation State
   const [validatedFiles, setValidatedFiles] = useState<ValidatedFile[]>([]);
@@ -49,8 +59,21 @@ export const App: React.FC = () => {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#/', '').replace('#', '');
-      if (['validate', 'documents', 'authorities', 'how-it-works', 'guides', 'faq', 'about'].includes(hash)) {
-        setCurrentPage(hash as NavPage);
+      const [page, sub] = hash.split('/');
+      if (page === 'terms' || sub === 'terms') {
+        setCurrentPage('about');
+        setAboutInitialTab('terms');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (page === 'privacy' || sub === 'privacy') {
+        setCurrentPage('about');
+        setAboutInitialTab('privacy');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (page === 'about') {
+        setCurrentPage('about');
+        setAboutInitialTab((sub as AboutSubTab) || 'about');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (['validate', 'documents', 'authorities', 'how-it-works', 'guides', 'faq'].includes(page)) {
+        setCurrentPage(page as NavPage);
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     };
@@ -59,12 +82,19 @@ export const App: React.FC = () => {
   }, []);
 
   const navigateTo = (page: NavPage, topic?: string) => {
-    setCurrentPage(page);
-    window.location.hash = `#/${page}`;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    if (topic) {
-      setGuidesInitialTopic(topic);
+    if (page === 'about') {
+      const targetTab: AboutSubTab = (topic as AboutSubTab) || 'about';
+      setCurrentPage('about');
+      setAboutInitialTab(targetTab);
+      window.location.hash = targetTab === 'about' ? '#/about' : `#/about/${targetTab}`;
+    } else {
+      setCurrentPage(page);
+      window.location.hash = `#/${page}`;
+      if (topic) {
+        setGuidesInitialTopic(topic);
+      }
     }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const addToast = (message: string, type: ToastMessage['type'] = 'info') => {
@@ -226,8 +256,6 @@ export const App: React.FC = () => {
               onOpenStats={() => setShowStatsModal(true)}
             />
 
-            {/* Zero-Retention & Privacy Guarantee Banner */}
-            <PrivacyBanner onScrollToValidate={() => navigateTo('validate')} />
           </div>
         )}
 
@@ -255,7 +283,14 @@ export const App: React.FC = () => {
         )}
 
         {currentPage === 'about' && (
-          <AboutPage onNavigateToValidate={() => navigateTo('validate')} />
+          <AboutPage
+            initialTab={aboutInitialTab}
+            onNavigateToValidate={() => navigateTo('validate')}
+            onTabChange={(tab) => {
+              setAboutInitialTab(tab);
+              window.location.hash = tab === 'about' ? '#/about' : `#/about/${tab}`;
+            }}
+          />
         )}
       </main>
 
