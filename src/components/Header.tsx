@@ -129,55 +129,55 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               type="button"
               className={`nav-link ${currentPage === 'validate' ? 'active' : ''}`}
-              style={{ textAlign: 'left', padding: '10px 12px', fontSize: '1rem', borderRadius: 8, backgroundColor: currentPage === 'validate' ? 'var(--primary-green-subtle)' : 'transparent' }}
+              style={{ textAlign: 'left', padding: '10px 14px', fontSize: '1rem', borderRadius: 8, backgroundColor: currentPage === 'validate' ? 'var(--primary-green-subtle)' : 'transparent' }}
               onClick={() => handleNavClick('validate')}
             >
-              Validate Digital Signatures
+              Validate
             </button>
             <button
               type="button"
               className={`nav-link ${currentPage === 'documents' ? 'active' : ''}`}
-              style={{ textAlign: 'left', padding: '10px 12px', fontSize: '1rem', borderRadius: 8, backgroundColor: currentPage === 'documents' ? 'var(--primary-green-subtle)' : 'transparent' }}
+              style={{ textAlign: 'left', padding: '10px 14px', fontSize: '1rem', borderRadius: 8, backgroundColor: currentPage === 'documents' ? 'var(--primary-green-subtle)' : 'transparent' }}
               onClick={() => handleNavClick('documents')}
             >
-              Supported Government Documents
+              Documents
             </button>
             <button
               type="button"
               className={`nav-link ${currentPage === 'authorities' ? 'active' : ''}`}
-              style={{ textAlign: 'left', padding: '10px 12px', fontSize: '1rem', borderRadius: 8, backgroundColor: currentPage === 'authorities' ? 'var(--primary-green-subtle)' : 'transparent' }}
+              style={{ textAlign: 'left', padding: '10px 14px', fontSize: '1rem', borderRadius: 8, backgroundColor: currentPage === 'authorities' ? 'var(--primary-green-subtle)' : 'transparent' }}
               onClick={() => handleNavClick('authorities')}
             >
-              CCA Trusted Authorities
+              Authorities
             </button>
             <button
               type="button"
               className={`nav-link ${currentPage === 'how-it-works' ? 'active' : ''}`}
-              style={{ textAlign: 'left', padding: '10px 12px', fontSize: '1rem', borderRadius: 8, backgroundColor: currentPage === 'how-it-works' ? 'var(--primary-green-subtle)' : 'transparent' }}
+              style={{ textAlign: 'left', padding: '10px 14px', fontSize: '1rem', borderRadius: 8, backgroundColor: currentPage === 'how-it-works' ? 'var(--primary-green-subtle)' : 'transparent' }}
               onClick={() => handleNavClick('how-it-works')}
             >
-              How It Works & Adobe Explainer
+              How It Works
             </button>
             <button
               type="button"
               className={`nav-link ${currentPage === 'guides' ? 'active' : ''}`}
-              style={{ textAlign: 'left', padding: '10px 12px', fontSize: '1rem', borderRadius: 8, backgroundColor: currentPage === 'guides' ? 'var(--primary-green-subtle)' : 'transparent' }}
+              style={{ textAlign: 'left', padding: '10px 14px', fontSize: '1rem', borderRadius: 8, backgroundColor: currentPage === 'guides' ? 'var(--primary-green-subtle)' : 'transparent' }}
               onClick={() => handleNavClick('guides')}
             >
-              Verification Guides & Help
+              Guides
             </button>
             <button
               type="button"
               className={`nav-link ${currentPage === 'faq' ? 'active' : ''}`}
-              style={{ textAlign: 'left', padding: '10px 12px', fontSize: '1rem', borderRadius: 8, backgroundColor: currentPage === 'faq' ? 'var(--primary-green-subtle)' : 'transparent' }}
+              style={{ textAlign: 'left', padding: '10px 14px', fontSize: '1rem', borderRadius: 8, backgroundColor: currentPage === 'faq' ? 'var(--primary-green-subtle)' : 'transparent' }}
               onClick={() => handleNavClick('faq')}
             >
-              Frequently Asked Questions (FAQ)
+              FAQ
             </button>
             <button
               type="button"
               className={`nav-link ${currentPage === 'about' ? 'active' : ''}`}
-              style={{ textAlign: 'left', padding: '10px 12px', fontSize: '1rem', borderRadius: 8, backgroundColor: currentPage === 'about' ? 'var(--primary-green-subtle)' : 'transparent' }}
+              style={{ textAlign: 'left', padding: '10px 14px', fontSize: '1rem', borderRadius: 8, backgroundColor: currentPage === 'about' ? 'var(--primary-green-subtle)' : 'transparent' }}
               onClick={() => handleNavClick('about')}
             >
               About
@@ -185,11 +185,11 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               type="button"
               className="nav-action-btn"
-              style={{ justifyContent: 'center', marginTop: '12px', padding: '12px 20px' }}
+              style={{ justifyContent: 'center', marginTop: '10px', padding: '10px 18px' }}
               onClick={() => handleNavClick('validate')}
             >
-              <span>Validate PDF Now</span>
-              <ArrowRight size={16} />
+              <span>Validate PDF</span>
+              <ArrowRight size={15} />
             </button>
           </div>
         )}
