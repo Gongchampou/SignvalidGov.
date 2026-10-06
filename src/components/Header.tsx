@@ -194,6 +194,30 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         )}
       </div>
+
+      {/* Red Running Privacy Ribbon Bar (Continuous Left-to-Right Stream) */}
+      <div className="red-privacy-ribbon" role="region" aria-label="100% Client-Side In-Memory Privacy Guarantee">
+        <div className="ribbon-ticker-track">
+          {[1, 2].map((set) => (
+            <div key={set} className="ribbon-ticker-group">
+              <span className="ribbon-badge">
+                <ShieldCheck size={13} style={{ display: 'inline', verticalAlign: '-2px', marginRight: 4 }} />
+                100% IN-MEMORY
+              </span>
+              <span className="ribbon-highlight">YOUR DETAILS NEVER RETAIN IN THIS SITE</span>
+              <span className="ribbon-bullet">◆</span>
+              <span>ZERO SERVER UPLOADS</span>
+              <span className="ribbon-bullet">◆</span>
+              <span>ALL VERIFICATION RUNS IN YOUR BROWSER RAM</span>
+              <span className="ribbon-bullet">◆</span>
+              <span>FILES ARE NEVER SAVED, STORED, OR TRANSMITTED</span>
+              <span className="ribbon-bullet">◆</span>
+              <span className="ribbon-highlight">COMPLETE PRIVACY GUARANTEED</span>
+              <span className="ribbon-bullet">◆</span>
+            </div>
+          ))}
+        </div>
+      </div>
     </header>
   );
 };

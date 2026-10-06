@@ -340,6 +340,91 @@ button {
   }
 }
 
+/* ==========================================================================
+   Red Running Privacy Ribbon (Marquee Stream from Left to Right)
+   ========================================================================== */
+.red-privacy-ribbon {
+  width: 100%;
+  background: linear-gradient(90deg, #991B1B 0%, #DC2626 25%, #EF4444 50%, #DC2626 75%, #991B1B 100%);
+  color: #FFFFFF;
+  overflow: hidden;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  position: relative;
+  height: 32px;
+  font-size: 0.77rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.28);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  user-select: none;
+  z-index: 99;
+}
+
+@media (max-width: 640px) {
+  .red-privacy-ribbon {
+    height: 28px;
+    font-size: 0.70rem;
+  }
+}
+
+.red-privacy-ribbon:hover .ribbon-ticker-track {
+  animation-play-state: paused;
+}
+
+.ribbon-ticker-track {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  will-change: transform;
+  animation: runLeftToRight 36s linear infinite;
+}
+
+@keyframes runLeftToRight {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+.ribbon-ticker-group {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding: 0 10px;
+}
+
+.ribbon-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background-color: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-weight: 800;
+  font-size: 0.69rem;
+  letter-spacing: 0.04em;
+  margin-right: 12px;
+  color: #FFFFFF;
+}
+
+.ribbon-highlight {
+  color: #FEF08A;
+  font-weight: 800;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+}
+
+.ribbon-bullet {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.65rem;
+  margin: 0 14px;
+}
+
 /* Hero Section */
 .hero-section {
   background: linear-gradient(180deg, #F4F8F5 0%, #FFFFFF 100%);
@@ -387,7 +472,7 @@ button {
   }
   .hero-grid > div:last-child {
     position: sticky;
-    top: 92px;
+    top: 114px;
   }
 }
 
@@ -956,7 +1041,7 @@ button {
 @media (min-width: 768px) {
   .results-preview-col {
     position: sticky;
-    top: 84px;
+    top: 114px;
     z-index: 10;
   }
 }
