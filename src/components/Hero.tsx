@@ -58,8 +58,8 @@ export const Hero: React.FC<HeroProps> = ({
           />
         ) : (
           <div className="hero-grid">
-            {/* Left Column: Copy & Value Propositions */}
-            <div>
+            {/* Left Column (Desktop) / Bottom Column (Mobile): Copy & Value Propositions */}
+            <div className="hero-copy-col">
               <div className="hero-pill-badge">
                 <Sparkles size={14} />
                 <span>Validate Indian government PDF signatures — and fix the yellow question mark for good.</span>
@@ -137,8 +137,8 @@ export const Hero: React.FC<HeroProps> = ({
               </div>
             </div>
 
-            {/* Right Column: Interactive Drag-and-Drop Area / Verification States */}
-            <div>
+            {/* Right Column (Desktop) / Top Column (Mobile): Interactive Drag-and-Drop Area / Verification States */}
+            <div className="hero-input-col">
               {isProcessing ? (
                 <VerificationProgress
                   fileName={processingFileName}

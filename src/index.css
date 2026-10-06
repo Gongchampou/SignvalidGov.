@@ -446,8 +446,8 @@ button {
 
 @media (max-width: 640px) {
   .hero-section {
-    padding-top: 28px;
-    padding-bottom: 44px;
+    padding-top: 16px;
+    padding-bottom: 36px;
   }
 }
 
@@ -465,12 +465,71 @@ button {
   align-items: start;
 }
 
-@media (min-width: 640px) and (max-width: 959px) {
+.hero-copy-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.hero-input-col {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Mobile & Tablet Portrait: Input Above, Wording Below, Unnecessary Words Removed */
+@media (max-width: 959px) {
   .hero-grid {
-    max-width: 680px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    max-width: 620px;
     margin-left: auto;
     margin-right: auto;
-    gap: 40px;
+  }
+
+  .hero-input-col {
+    order: 1; /* Input placed ABOVE on mobile */
+    width: 100%;
+  }
+
+  .hero-copy-col {
+    order: 2; /* Wording placed BELOW on mobile */
+    width: 100%;
+    align-items: center;
+    text-align: center;
+  }
+
+  /* Remove unnecessary wording on mobile view only */
+  .hero-pill-badge {
+    display: none !important;
+  }
+
+  .hero-desc {
+    display: none !important;
+  }
+
+  .hero-value-props {
+    display: none !important;
+  }
+
+  .dropzone-paste-tip {
+    display: none !important;
+  }
+
+  .hero-title {
+    font-size: 1.35rem;
+    line-height: 1.3;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+
+  .before-after-card {
+    justify-content: center;
+    margin-bottom: 16px;
+    width: 100%;
+  }
+
+  .social-proof-banner {
+    justify-content: center;
   }
 }
 
@@ -479,9 +538,13 @@ button {
     grid-template-columns: 1.15fr 1fr;
     gap: 48px;
   }
-  .hero-grid > div:last-child {
+  .hero-copy-col {
+    order: 1;
+  }
+  .hero-input-col {
+    order: 2;
     position: sticky;
-    top: 114px;
+    top: 96px;
   }
 }
 
