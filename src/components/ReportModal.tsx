@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, ShieldCheck, Copy, Download, Key, Lock, FileCheck } from 'lucide-react';
+import { X, ShieldCheck, Copy, Download, Key, Lock, FileCheck, AlertCircle } from 'lucide-react';
 import type { ValidatedFile } from '../types';
 import { generateValidatedPdf } from '../utils/pdfGenerator';
 import { createGreenTickCopy, downloadBytes, PasswordRequiredError } from '../verify/stampPdf';
@@ -26,6 +26,22 @@ export const ReportModal: React.FC<ReportModalProps> = ({
     try {
       setIsStamping(true);
       setStampError(null);
+
+      // If document is already verified, directly download the clean verified file
+      if (file.status === 'already_verified') {
+        const outName = file.name.endsWith('_verified.pdf')
+          ? file.name
+          : file.name.replace(/\.pdf$/i, '') + '_verified.pdf';
+        downloadBytes(file.bytes, outName);
+        return;
+      }
+
+      // If document is unsigned, report clear error and do not stamp
+      if (file.status === 'unsigned' || file.signatures.length === 0) {
+        setStampError('Error: This document has no digital signature to verify or stamp.');
+        return;
+      }
+
       const stampedBytes = await createGreenTickCopy(file, pwd);
       const outName = file.name.replace(/\.pdf$/i, '') + '_verified.pdf';
       downloadBytes(stampedBytes, outName);
@@ -260,15 +276,38 @@ export const ReportModal: React.FC<ReportModalProps> = ({
               <span>1-Page Summary Certificate</span>
             </button>
 
-            <button
-              type="button"
-              className="download-cta-btn"
-              onClick={() => handleDownloadStamped()}
-              disabled={isStamping}
-            >
-              <Download size={16} />
-              <span>{isStamping ? 'Stamping Green Tick...' : 'Download Validated PDF (with Green Tick ✓)'}</span>
-            </button>
+            {file.status === 'already_verified' ? (
+              <button
+                type="button"
+                className="download-cta-btn"
+                onClick={() => handleDownloadStamped()}
+                title="Save verified PDF (already contains permanent green checkmark)"
+              >
+                <Download size={16} />
+                <span>Download Verified PDF (Green Tick Embedded ✓)</span>
+              </button>
+            ) : file.status === 'unsigned' ? (
+              <button
+                type="button"
+                className="download-cta-btn"
+                disabled
+                style={{ opacity: 0.5, cursor: 'not-allowed', backgroundColor: '#9CA3AF' }}
+                title="Cannot stamp: Missing digital signature"
+              >
+                <AlertCircle size={16} />
+                <span>Cannot Stamp (Missing Signature)</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="download-cta-btn"
+                onClick={() => handleDownloadStamped()}
+                disabled={isStamping}
+              >
+                <Download size={16} />
+                <span>{isStamping ? 'Stamping Green Tick...' : 'Download Validated PDF (with Green Tick ✓)'}</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
