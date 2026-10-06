@@ -155,8 +155,8 @@ export const PdfLivePreview: React.FC<PdfLivePreviewProps> = ({
       const availableWidth = Math.max(280, containerWidth - padding);
       const unscaledViewport = page.getViewport({ scale: 1.0 });
       
-      // Smart base scale: fits neatly on mobile & tablet, capped at 1.35 on big monitors
-      const autoFitScale = Math.min(1.35, availableWidth / unscaledViewport.width);
+      // Smart base scale: fits neatly on mobile & tablet, expands generously on bigger monitors
+      const autoFitScale = Math.min(2.2, Math.max(0.5, availableWidth / unscaledViewport.width));
       const effectiveScale = autoFitScale * zoom;
       const viewport = page.getViewport({ scale: effectiveScale });
 
@@ -193,15 +193,31 @@ export const PdfLivePreview: React.FC<PdfLivePreviewProps> = ({
     }
   }, [loading, pageNum, zoom, renderCurrentPage]);
 
-  // Handle window resize for dynamic responsive refit
+  // Handle window and container resize for dynamic responsive refit
   useEffect(() => {
-    const handleResize = () => {
-      if (!loading && pdfDocRef.current) {
-        renderCurrentPage();
-      }
+    let timeoutId: any;
+    const triggerRerender = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        if (!loading && pdfDocRef.current) {
+          renderCurrentPage();
+        }
+      }, 100);
     };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+
+    window.addEventListener('resize', triggerRerender);
+
+    let observer: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined' && containerRef.current) {
+      observer = new ResizeObserver(triggerRerender);
+      observer.observe(containerRef.current);
+    }
+
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('resize', triggerRerender);
+      if (observer) observer.disconnect();
+    };
   }, [loading, renderCurrentPage]);
 
   const handlePrevPage = () => {

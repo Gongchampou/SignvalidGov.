@@ -1,26 +1,22 @@
 import React, { useState } from 'react';
 import { ShieldCheck, Check, Menu, X, ArrowRight } from 'lucide-react';
 
+export type NavPage = 'validate' | 'documents' | 'authorities' | 'how-it-works' | 'guides' | 'faq' | 'about';
+
 interface HeaderProps {
-  onOpenGuides: (topic?: string) => void;
-  onOpenAbout: () => void;
-  onOpenStats: () => void;
-  onScrollToValidate: () => void;
+  currentPage: NavPage;
+  onNavigate: (page: NavPage) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
-  onOpenGuides,
-  onOpenAbout,
-  onScrollToValidate
+  currentPage,
+  onNavigate
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const scrollTo = (id: string) => {
+  const handleNavClick = (page: NavPage) => {
     setMobileMenuOpen(false);
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
+    onNavigate(page);
   };
 
   return (
@@ -28,7 +24,12 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="container">
         <div className="header-inner">
           {/* Brand Logo & Name */}
-          <div className="brand-wrapper" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} style={{ cursor: 'pointer' }}>
+          <div
+            className="brand-wrapper"
+            onClick={() => handleNavClick('validate')}
+            style={{ cursor: 'pointer' }}
+            title="Go to SignValid Home / Validator"
+          >
             <div className="brand-logo-badge">
               <Check size={22} strokeWidth={3} />
             </div>
@@ -45,54 +46,60 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Desktop Navigation Links */}
           <nav className="nav-links">
-            <a
-              href="#validate"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onScrollToValidate();
-              }}
-            >
-              Validate
-            </a>
-            <a
-              href="#documents"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                scrollTo('documents');
-              }}
-            >
-              Documents
-            </a>
-            <a
-              href="#authorities"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                scrollTo('authorities');
-              }}
-            >
-              Trusted Authorities
-            </a>
             <button
               type="button"
-              className="nav-link"
-              onClick={() => onOpenGuides()}
+              className={`nav-link ${currentPage === 'validate' ? 'active' : ''}`}
+              onClick={() => handleNavClick('validate')}
+            >
+              Validate
+            </button>
+            <button
+              type="button"
+              className={`nav-link ${currentPage === 'documents' ? 'active' : ''}`}
+              onClick={() => handleNavClick('documents')}
+            >
+              Documents
+            </button>
+            <button
+              type="button"
+              className={`nav-link ${currentPage === 'authorities' ? 'active' : ''}`}
+              onClick={() => handleNavClick('authorities')}
+            >
+              Authorities
+            </button>
+            <button
+              type="button"
+              className={`nav-link ${currentPage === 'how-it-works' ? 'active' : ''}`}
+              onClick={() => handleNavClick('how-it-works')}
+            >
+              How It Works
+            </button>
+            <button
+              type="button"
+              className={`nav-link ${currentPage === 'guides' ? 'active' : ''}`}
+              onClick={() => handleNavClick('guides')}
             >
               Guides
             </button>
             <button
               type="button"
-              className="nav-link"
-              onClick={onOpenAbout}
+              className={`nav-link ${currentPage === 'faq' ? 'active' : ''}`}
+              onClick={() => handleNavClick('faq')}
             >
-              About
+              FAQ
             </button>
             <button
               type="button"
+              className={`nav-link ${currentPage === 'about' ? 'active' : ''}`}
+              onClick={() => handleNavClick('about')}
+            >
+              About
+            </button>
+
+            <button
+              type="button"
               className="nav-action-btn"
-              onClick={onScrollToValidate}
+              onClick={() => handleNavClick('validate')}
             >
               <span>Validate PDF</span>
               <ArrowRight size={16} />
@@ -117,65 +124,69 @@ export const Header: React.FC<HeaderProps> = ({
             borderTop: '1px solid var(--border-subtle)',
             display: 'flex',
             flexDirection: 'column',
-            gap: '12px'
+            gap: '8px'
           }}>
             <button
               type="button"
-              className="nav-link"
-              style={{ textAlign: 'left', padding: '8px 0', fontSize: '1.05rem' }}
-              onClick={() => {
-                setMobileMenuOpen(false);
-                onScrollToValidate();
-              }}
+              className={`nav-link ${currentPage === 'validate' ? 'active' : ''}`}
+              style={{ textAlign: 'left', padding: '10px 12px', fontSize: '1rem', borderRadius: 8, backgroundColor: currentPage === 'validate' ? 'var(--primary-green-subtle)' : 'transparent' }}
+              onClick={() => handleNavClick('validate')}
             >
               Validate Digital Signatures
             </button>
             <button
               type="button"
-              className="nav-link"
-              style={{ textAlign: 'left', padding: '8px 0', fontSize: '1.05rem' }}
-              onClick={() => scrollTo('documents')}
+              className={`nav-link ${currentPage === 'documents' ? 'active' : ''}`}
+              style={{ textAlign: 'left', padding: '10px 12px', fontSize: '1rem', borderRadius: 8, backgroundColor: currentPage === 'documents' ? 'var(--primary-green-subtle)' : 'transparent' }}
+              onClick={() => handleNavClick('documents')}
             >
               Supported Government Documents
             </button>
             <button
               type="button"
-              className="nav-link"
-              style={{ textAlign: 'left', padding: '8px 0', fontSize: '1.05rem' }}
-              onClick={() => scrollTo('authorities')}
+              className={`nav-link ${currentPage === 'authorities' ? 'active' : ''}`}
+              style={{ textAlign: 'left', padding: '10px 12px', fontSize: '1rem', borderRadius: 8, backgroundColor: currentPage === 'authorities' ? 'var(--primary-green-subtle)' : 'transparent' }}
+              onClick={() => handleNavClick('authorities')}
             >
               CCA Trusted Authorities
             </button>
             <button
               type="button"
-              className="nav-link"
-              style={{ textAlign: 'left', padding: '8px 0', fontSize: '1.05rem' }}
-              onClick={() => {
-                setMobileMenuOpen(false);
-                onOpenGuides();
-              }}
+              className={`nav-link ${currentPage === 'how-it-works' ? 'active' : ''}`}
+              style={{ textAlign: 'left', padding: '10px 12px', fontSize: '1rem', borderRadius: 8, backgroundColor: currentPage === 'how-it-works' ? 'var(--primary-green-subtle)' : 'transparent' }}
+              onClick={() => handleNavClick('how-it-works')}
             >
-              Verification Guides
+              How It Works & Adobe Explainer
             </button>
             <button
               type="button"
-              className="nav-link"
-              style={{ textAlign: 'left', padding: '8px 0', fontSize: '1.05rem' }}
-              onClick={() => {
-                setMobileMenuOpen(false);
-                onOpenAbout();
-              }}
+              className={`nav-link ${currentPage === 'guides' ? 'active' : ''}`}
+              style={{ textAlign: 'left', padding: '10px 12px', fontSize: '1rem', borderRadius: 8, backgroundColor: currentPage === 'guides' ? 'var(--primary-green-subtle)' : 'transparent' }}
+              onClick={() => handleNavClick('guides')}
             >
-              About SignValid & Privacy
+              Verification Guides & Help
+            </button>
+            <button
+              type="button"
+              className={`nav-link ${currentPage === 'faq' ? 'active' : ''}`}
+              style={{ textAlign: 'left', padding: '10px 12px', fontSize: '1rem', borderRadius: 8, backgroundColor: currentPage === 'faq' ? 'var(--primary-green-subtle)' : 'transparent' }}
+              onClick={() => handleNavClick('faq')}
+            >
+              Frequently Asked Questions (FAQ)
+            </button>
+            <button
+              type="button"
+              className={`nav-link ${currentPage === 'about' ? 'active' : ''}`}
+              style={{ textAlign: 'left', padding: '10px 12px', fontSize: '1rem', borderRadius: 8, backgroundColor: currentPage === 'about' ? 'var(--primary-green-subtle)' : 'transparent' }}
+              onClick={() => handleNavClick('about')}
+            >
+              About SignValid & Security
             </button>
             <button
               type="button"
               className="nav-action-btn"
-              style={{ justifyContent: 'center', marginTop: '8px' }}
-              onClick={() => {
-                setMobileMenuOpen(false);
-                onScrollToValidate();
-              }}
+              style={{ justifyContent: 'center', marginTop: '12px', padding: '12px 20px' }}
+              onClick={() => handleNavClick('validate')}
             >
               <span>Validate PDF Now</span>
               <ArrowRight size={16} />

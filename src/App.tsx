@@ -1,25 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { Header } from './components/Header';
+import type { NavPage } from './components/Header';
 import { Hero } from './components/Hero';
-import { AdobeExplainer } from './components/AdobeExplainer';
-import { HowItWorks } from './components/HowItWorks';
-import { SupportedDocsSection } from './components/SupportedDocsSection';
-import { AuthoritiesSection } from './components/AuthoritiesSection';
+import { DocumentsPage } from './components/DocumentsPage';
+import { AuthoritiesPage } from './components/AuthoritiesPage';
+import { HowItWorksPage } from './components/HowItWorksPage';
+import { GuidesPage } from './components/GuidesPage';
+import { FaqPage } from './components/FaqPage';
+import { AboutPage } from './components/AboutPage';
 import { PrivacyBanner } from './components/PrivacyBanner';
-import { FaqSection } from './components/FaqSection';
 import { Footer } from './components/Footer';
 import { CookieBanner } from './components/CookieBanner';
 import { ReportModal } from './components/ReportModal';
 import { StatsModal } from './components/StatsModal';
-import { GuidesModal } from './components/GuidesModal';
 import { Toast } from './components/Toast';
 import type { ToastMessage } from './components/Toast';
 import type { ValidatedFile } from './types';
 import { verifyPdf } from './verify/verifyPdf';
 
 export const App: React.FC = () => {
-  // State
+  // Navigation Page State with URL hash sync
+  const [currentPage, setCurrentPage] = useState<NavPage>(() => {
+    const hash = window.location.hash.replace('#/', '').replace('#', '');
+    if (['validate', 'documents', 'authorities', 'how-it-works', 'guides', 'faq', 'about'].includes(hash)) {
+      return hash as NavPage;
+    }
+    return 'validate';
+  });
+  const [guidesInitialTopic, setGuidesInitialTopic] = useState<string>('adobe');
+
+  // Files & Validation State
   const [validatedFiles, setValidatedFiles] = useState<ValidatedFile[]>([]);
   const [activeFileIndex, setActiveFileIndex] = useState<number>(0);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
@@ -30,10 +41,31 @@ export const App: React.FC = () => {
   // Modals state
   const [reportModalFile, setReportModalFile] = useState<ValidatedFile | null>(null);
   const [showStatsModal, setShowStatsModal] = useState<boolean>(false);
-  const [guidesTopic, setGuidesTopic] = useState<string | null>(null);
 
   // Toasts
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
+
+  // Sync hash changes (browser back/forward button navigation)
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#/', '').replace('#', '');
+      if (['validate', 'documents', 'authorities', 'how-it-works', 'guides', 'faq', 'about'].includes(hash)) {
+        setCurrentPage(hash as NavPage);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  const navigateTo = (page: NavPage, topic?: string) => {
+    setCurrentPage(page);
+    window.location.hash = `#/${page}`;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (topic) {
+      setGuidesInitialTopic(topic);
+    }
+  };
 
   const addToast = (message: string, type: ToastMessage['type'] = 'info') => {
     const id = Date.now().toString() + Math.random().toString().slice(2, 6);
@@ -47,19 +79,12 @@ export const App: React.FC = () => {
     setToasts(prev => prev.filter(t => t.id !== id));
   };
 
-  const scrollToValidate = () => {
-    const el = document.getElementById('validate');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  };
-
   // REAL cryptographic verification of uploaded files
   const handleFilesSelected = async (files: File[]) => {
     if (files.length === 0) return;
 
+    // Immediately switch to validate page so user sees progress and results
+    navigateTo('validate');
     setIsProcessing(true);
 
     try {
@@ -113,6 +138,7 @@ export const App: React.FC = () => {
 
   // Instant testing with pre-computed official samples
   const handleSelectSample = (sampleDoc: Omit<ValidatedFile, 'id' | 'uploadDate'>) => {
+    navigateTo('validate');
     setIsProcessing(true);
     setProcessingFileName(sampleDoc.name);
     setProcessingProgress(30);
@@ -120,7 +146,7 @@ export const App: React.FC = () => {
 
     setTimeout(() => {
       setProcessingProgress(70);
-      setProcessingStep('Validating against CCA India Root 2014...');
+      setProcessingStep('Validating against CCA India Root...');
     }, 400);
 
     setTimeout(() => {
@@ -140,7 +166,7 @@ export const App: React.FC = () => {
       setValidatedFiles(prev => [sampleItem, ...prev]);
       setActiveFileIndex(0);
       setIsProcessing(false);
-      addToast(`Sample "${sampleDoc.sampleType}" verified with CCA India 2014!`, 'success');
+      addToast(`Sample "${sampleDoc.sampleType}" verified with CCA India!`, 'success');
     }, 900);
   };
 
@@ -153,14 +179,14 @@ export const App: React.FC = () => {
     setValidatedFiles([]);
     setActiveFileIndex(0);
     setIsProcessing(false);
-    scrollToValidate();
+    navigateTo('validate');
   };
 
   const handleRemoveFile = (index: number) => {
     setValidatedFiles(prev => {
       const next = prev.filter((_, i) => i !== index);
       if (next.length === 0) {
-        scrollToValidate();
+        navigateTo('validate');
       }
       return next;
     });
@@ -172,58 +198,69 @@ export const App: React.FC = () => {
       {/* Toast Notification Layer */}
       <Toast toasts={toasts} onDismiss={removeToast} />
 
-      {/* Fixed Top Header */}
+      {/* Fixed Top Header with Page Navigation Tabs */}
       <Header
-        onOpenGuides={(topic) => setGuidesTopic(topic || 'adobe')}
-        onOpenAbout={() => setGuidesTopic('about')}
-        onOpenStats={() => setShowStatsModal(true)}
-        onScrollToValidate={scrollToValidate}
+        currentPage={currentPage}
+        onNavigate={(page) => navigateTo(page)}
       />
 
+      {/* Main Multi-Page Routed View */}
       <main>
-        {/* Split 2-Column Hero with Interactive Drag-and-Drop Area */}
-        <Hero
-          onFilesSelected={handleFilesSelected}
-          onSelectSample={handleSelectSample}
-          onErrorToast={(msg) => addToast(msg, 'error')}
-          validatedFiles={validatedFiles}
-          activeFileIndex={activeFileIndex}
-          onSelectFileIndex={setActiveFileIndex}
-          onOpenReportModal={(file) => setReportModalFile(file)}
-          onReset={handleReset}
-          onRemoveFile={handleRemoveFile}
-          isProcessing={isProcessing}
-          processingProgress={processingProgress}
-          processingStep={processingStep}
-          processingFileName={processingFileName}
-          onOpenStats={() => setShowStatsModal(true)}
-        />
+        {currentPage === 'validate' && (
+          <div className="page-content-wrapper">
+            {/* Validation Workspace Hero (Dropzone + Live Preview + Results) */}
+            <Hero
+              onFilesSelected={handleFilesSelected}
+              onSelectSample={handleSelectSample}
+              onErrorToast={(msg) => addToast(msg, 'error')}
+              validatedFiles={validatedFiles}
+              activeFileIndex={activeFileIndex}
+              onSelectFileIndex={setActiveFileIndex}
+              onOpenReportModal={(file) => setReportModalFile(file)}
+              onReset={handleReset}
+              onRemoveFile={handleRemoveFile}
+              isProcessing={isProcessing}
+              processingProgress={processingProgress}
+              processingStep={processingStep}
+              processingFileName={processingFileName}
+              onOpenStats={() => setShowStatsModal(true)}
+            />
 
-        {/* Educational Explainer: Why does Adobe show a yellow question mark? */}
-        <AdobeExplainer onScrollToValidate={scrollToValidate} />
+            {/* Zero-Retention & Privacy Guarantee Banner */}
+            <PrivacyBanner onScrollToValidate={() => navigateTo('validate')} />
+          </div>
+        )}
 
-        {/* 3-Step Process: How SignValid works */}
-        <HowItWorks />
+        {currentPage === 'documents' && (
+          <DocumentsPage onNavigateToValidate={() => navigateTo('validate')} />
+        )}
 
-        {/* Supported Documents Grid with Categorized Tabs & Search */}
-        <SupportedDocsSection />
+        {currentPage === 'authorities' && (
+          <AuthoritiesPage onNavigateToValidate={() => navigateTo('validate')} />
+        )}
 
-        {/* Trusted Certificate Authorities (CCA India) */}
-        <AuthoritiesSection />
+        {currentPage === 'how-it-works' && (
+          <HowItWorksPage onNavigateToValidate={() => navigateTo('validate')} />
+        )}
 
-        {/* Zero-Retention & Privacy Guarantee Banner */}
-        <PrivacyBanner onScrollToValidate={scrollToValidate} />
+        {currentPage === 'guides' && (
+          <GuidesPage
+            initialTopic={guidesInitialTopic}
+            onNavigateToValidate={() => navigateTo('validate')}
+          />
+        )}
 
-        {/* Frequently Asked Questions Accordion */}
-        <FaqSection />
+        {currentPage === 'faq' && (
+          <FaqPage onNavigateToValidate={() => navigateTo('validate')} />
+        )}
+
+        {currentPage === 'about' && (
+          <AboutPage onNavigateToValidate={() => navigateTo('validate')} />
+        )}
       </main>
 
-      {/* Multi-Column Footer with Legal Notice */}
-      <Footer
-        onOpenGuides={(topic) => setGuidesTopic(topic || 'adobe')}
-        onOpenAbout={() => setGuidesTopic('about')}
-        onScrollToValidate={scrollToValidate}
-      />
+      {/* Multi-Column Footer with Page Navigation */}
+      <Footer onNavigate={(page, topic) => navigateTo(page, topic)} />
 
       {/* Floating Cookie / Analytics Notice */}
       <CookieBanner />
@@ -239,14 +276,6 @@ export const App: React.FC = () => {
 
       {showStatsModal && (
         <StatsModal onClose={() => setShowStatsModal(false)} />
-      )}
-
-      {guidesTopic && (
-        <GuidesModal
-          initialTopic={guidesTopic}
-          onClose={() => setGuidesTopic(null)}
-          onScrollToValidate={scrollToValidate}
-        />
       )}
     </div>
   );

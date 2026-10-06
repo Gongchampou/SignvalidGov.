@@ -1,24 +1,23 @@
 import React from 'react';
 import { ShieldCheck, Check, ExternalLink } from 'lucide-react';
+import type { NavPage } from './Header';
 
 interface FooterProps {
-  onOpenGuides: (topic?: string) => void;
-  onOpenAbout: () => void;
-  onScrollToValidate: () => void;
+  onNavigate: (page: NavPage, topic?: string) => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({
-  onOpenGuides,
-  onOpenAbout,
-  onScrollToValidate
-}) => {
+export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
   return (
     <footer className="footer-main">
       <div className="container">
         <div className="footer-grid">
           {/* Column 1: Brand & Mission */}
           <div>
-            <div className="brand-wrapper" style={{ marginBottom: 14 }}>
+            <div
+              className="brand-wrapper"
+              style={{ marginBottom: 14, cursor: 'pointer' }}
+              onClick={() => onNavigate('validate')}
+            >
               <div className="brand-logo-badge">
                 <Check size={22} strokeWidth={3} />
               </div>
@@ -29,66 +28,101 @@ export const Footer: React.FC<FooterProps> = ({
             <p style={{ fontSize: '0.88rem', color: 'var(--color-body)', lineHeight: 1.6, maxWidth: 360, marginBottom: 16 }}>
               The independent cryptographic verification utility for Indian digital government documents. Validating PKCS#7 signatures against the Controller of Certifying Authorities (CCA) root hierarchy.
             </p>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: '0.78rem', color: 'var(--primary-green)', fontWeight: 600 }}>
+            <div
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: '0.78rem', color: 'var(--primary-green)', fontWeight: 600, cursor: 'pointer' }}
+              onClick={() => onNavigate('authorities')}
+            >
               <ShieldCheck size={16} />
-              <span>Official CCA India 2014 Trust Store Root</span>
+              <span>Official CCA India Root Trust Store</span>
             </div>
           </div>
 
-          {/* Column 2: Guides */}
+          {/* Column 2: Quick Pages Navigation */}
           <div>
-            <h4 className="footer-col-title">Verification Guides</h4>
+            <h4 className="footer-col-title">Navigation</h4>
             <ul className="footer-nav-list">
               <li>
-                <span className="footer-nav-link" onClick={() => onOpenGuides('eaadhaar')}>
-                  e-Aadhaar validation
+                <span className="footer-nav-link" onClick={() => onNavigate('validate')}>
+                  Validate Digital Signature
                 </span>
               </li>
               <li>
-                <span className="footer-nav-link" onClick={() => onOpenGuides('edistrict')}>
-                  State e-District certificates
+                <span className="footer-nav-link" onClick={() => onNavigate('documents')}>
+                  Supported Government Documents
                 </span>
               </li>
               <li>
-                <span className="footer-nav-link" onClick={() => onOpenGuides('adobe')}>
-                  Fixing "Validity Unknown" in Adobe
+                <span className="footer-nav-link" onClick={() => onNavigate('authorities')}>
+                  CCA Trusted Authorities
                 </span>
               </li>
               <li>
-                <span className="footer-nav-link" onClick={() => onOpenGuides('digilocker')}>
-                  DigiLocker signatures & marksheets
+                <span className="footer-nav-link" onClick={() => onNavigate('how-it-works')}>
+                  How It Works & Adobe Explainer
                 </span>
               </li>
               <li>
-                <span className="footer-nav-link" onClick={onScrollToValidate}>
-                  Batch PDF validation
+                <span className="footer-nav-link" onClick={() => onNavigate('faq')}>
+                  Frequently Asked Questions (FAQ)
                 </span>
               </li>
             </ul>
           </div>
 
-          {/* Column 3: About & Legal */}
+          {/* Column 3: Guides & Compliance */}
+          <div>
+            <h4 className="footer-col-title">Verification Guides</h4>
+            <ul className="footer-nav-list">
+              <li>
+                <span className="footer-nav-link" onClick={() => onNavigate('guides', 'eaadhaar')}>
+                  e-Aadhaar validation guide
+                </span>
+              </li>
+              <li>
+                <span className="footer-nav-link" onClick={() => onNavigate('guides', 'edistrict')}>
+                  State e-District certificates
+                </span>
+              </li>
+              <li>
+                <span className="footer-nav-link" onClick={() => onNavigate('how-it-works')}>
+                  Fixing "Validity Unknown" in Adobe
+                </span>
+              </li>
+              <li>
+                <span className="footer-nav-link" onClick={() => onNavigate('guides', 'digilocker')}>
+                  DigiLocker marksheets & degrees
+                </span>
+              </li>
+              <li>
+                <span className="footer-nav-link" onClick={() => onNavigate('guides', 'passwords')}>
+                  Encrypted PDF password formats
+                </span>
+              </li>
+              <li>
+                <span className="footer-nav-link" onClick={() => onNavigate('guides', 'printing')}>
+                  Paper printout green tick guide
+                </span>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 4: About & Legal */}
           <div>
             <h4 className="footer-col-title">About & Legal</h4>
             <ul className="footer-nav-list">
               <li>
-                <span className="footer-nav-link" onClick={onOpenAbout}>
+                <span className="footer-nav-link" onClick={() => onNavigate('about')}>
                   About SignValid
                 </span>
               </li>
               <li>
-                <span className="footer-nav-link" onClick={onOpenAbout}>
-                  Zero-Retention Privacy Policy
+                <span className="footer-nav-link" onClick={() => onNavigate('about')}>
+                  Zero-Retention Privacy Guarantee
                 </span>
               </li>
               <li>
-                <span className="footer-nav-link" onClick={onOpenAbout}>
-                  Terms of Service & IT Act 2000
-                </span>
-              </li>
-              <li>
-                <span className="footer-nav-link" onClick={onOpenAbout}>
-                  What's New in v2.4
+                <span className="footer-nav-link" onClick={() => onNavigate('about')}>
+                  Information Technology Act 2000
                 </span>
               </li>
               <li>
@@ -110,7 +144,7 @@ export const Footer: React.FC<FooterProps> = ({
         {/* Mandatory Legal Notice */}
         <div className="footer-disclaimer-card">
           <strong>Mandatory Notice: </strong>
-          SignValid is an independent tool and is not affiliated with UIDAI, the Government of India, or any state government. Files are processed in memory and never stored.
+          SignValid is an independent cryptographic verification utility and is not affiliated with UIDAI, MeitY, the Government of India, or any state government. All files are processed strictly in volatile memory and never stored.
         </div>
 
         {/* Bottom Credits & Copyright */}
@@ -118,8 +152,12 @@ export const Footer: React.FC<FooterProps> = ({
           <div>
             © {new Date().getFullYear()} SignValid. Public interest cryptographic verification utility.
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            Built for Indian citizens with respect for digital sovereignty & privacy.
+          <div style={{ display: 'flex', gap: 16 }}>
+            <span style={{ cursor: 'pointer' }} onClick={() => onNavigate('about')}>Privacy Policy</span>
+            <span>•</span>
+            <span style={{ cursor: 'pointer' }} onClick={() => onNavigate('about')}>Terms of Service</span>
+            <span>•</span>
+            <span style={{ cursor: 'pointer' }} onClick={() => onNavigate('faq')}>Help</span>
           </div>
         </div>
       </div>
