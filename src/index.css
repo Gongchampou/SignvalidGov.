@@ -2612,59 +2612,60 @@ button {
 .footer-main {
   background-color: #F9FAFB;
   border-top: 1px solid var(--border-subtle);
-  padding-top: 64px;
-  padding-bottom: 36px;
+  padding-top: 36px;
+  padding-bottom: 20px;
 }
 
 @media (max-width: 640px) {
   .footer-main {
-    padding-top: 44px;
-    padding-bottom: 28px;
+    padding-top: 24px;
+    padding-bottom: 16px;
   }
 }
 
 .footer-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 36px;
-  margin-bottom: 44px;
+  gap: 24px;
+  margin-bottom: 24px;
 }
 
 @media (min-width: 768px) {
   .footer-grid {
     grid-template-columns: 1.4fr 1fr 1fr;
-    gap: 40px;
+    gap: 32px;
   }
 }
 
 @media (min-width: 1440px) {
   .footer-grid {
     grid-template-columns: 1.6fr 1fr 1fr;
-    gap: 56px;
+    gap: 48px;
   }
 }
 
 .footer-col-title {
-  font-size: 0.92rem;
+  font-size: 0.84rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--color-heading-dark);
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 
 .footer-nav-list {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
 }
 
 .footer-nav-link {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: var(--color-body);
   transition: color var(--transition-fast);
   cursor: pointer;
+  line-height: 1.4;
 }
 
 .footer-nav-link:hover {
@@ -2676,11 +2677,11 @@ button {
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  font-size: 0.84rem;
+  gap: 12px;
+  font-size: 0.8rem;
   color: var(--color-light);
   border-top: 1px solid var(--border-subtle);
-  padding-top: 24px;
+  padding-top: 16px;
 }
 
 @media (min-width: 640px) {
