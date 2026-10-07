@@ -321,6 +321,9 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
                   type="password"
                   placeholder="Enter document password"
                   value={passwordInput}
+                  maxLength={64}
+                  autoComplete="off"
+                  spellCheck={false}
                   onChange={(e) => setPasswordInput(e.target.value)}
                   style={{
                     flex: 1,

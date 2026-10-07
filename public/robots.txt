@@ -1,0 +1,7 @@
+# robots.txt for SignValid — https://signvalid.pages.dev
+User-agent: *
+Allow: /
+
+# Canonical Sitemap location
+Sitemap: https://signvalid.pages.dev/sitemap.xml
+Host: https://signvalid.pages.dev

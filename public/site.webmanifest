@@ -1,0 +1,21 @@
+{
+  "name": "SignValid — Digital Signature Validator",
+  "short_name": "SignValid",
+  "description": "Validate Indian government PDF digital signatures (e-Aadhaar, e-District, DigiLocker, PAN e-card) against the official India CCA root trust store.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#126B44",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "48x48",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/og-image.jpg",
+      "sizes": "1200x630",
+      "type": "image/jpeg"
+    }
+  ]
+}

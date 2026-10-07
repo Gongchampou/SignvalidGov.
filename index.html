@@ -10,6 +10,146 @@
     <meta name="description" content="Validate Indian government PDF signatures (e-Aadhaar, e-District, e-Seba, DigiLocker, PAN e-card) against India CCA root trust store and fix the yellow question mark." />
     <title>SignValid — Validate Indian Digital Signatures & Fix Validity Unknown</title>
     <link rel="canonical" href="https://signvalid.pages.dev/" />
+
+    <!-- Security: Anti-Clickjacking, CSP & MIME Protection -->
+    <meta http-equiv="X-Frame-Options" content="DENY" />
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+    <!-- Anti-Clickjacking Framebuster defense (Blocks UI redressing in iframes) -->
+    <style id="antiClickjack">
+      html { display: none !important; }
+    </style>
+    <script>
+      (function() {
+        if (self === top) {
+          var el = document.getElementById("antiClickjack");
+          if (el && el.parentNode) {
+            el.parentNode.removeChild(el);
+          }
+        } else {
+          top.location = self.location;
+        }
+      })();
+    </script>
+
+    <!-- Crawlers & Indexing Directives -->
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+
+    <!-- Open Graph / Facebook / WhatsApp / LinkedIn / Telegram Previews -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://signvalid.pages.dev/" />
+    <meta property="og:site_name" content="SignValid" />
+    <meta property="og:locale" content="en_IN" />
+    <meta property="og:title" content="SignValid — Validate Indian Digital Signatures & Fix Validity Unknown" />
+    <meta property="og:description" content="Free online Indian government PDF digital signature validator. Check e-Aadhaar, e-District, DigiLocker, and PAN digital signatures against official CCA India root trust store with 100% in-browser RAM privacy." />
+    <meta property="og:image" content="https://signvalid.pages.dev/og-image.jpg" />
+    <meta property="og:image:secure_url" content="https://signvalid.pages.dev/og-image.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="SignValid - Indian Government PDF Digital Signature Validator" />
+
+    <!-- Twitter Card Meta Tags (X) -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://signvalid.pages.dev/" />
+    <meta name="twitter:title" content="SignValid — Validate Indian Digital Signatures & Fix Validity Unknown" />
+    <meta name="twitter:description" content="Free online Indian government PDF digital signature validator against CCA India root certificates. Fixes Adobe validity unknown with zero server retention." />
+    <meta name="twitter:image" content="https://signvalid.pages.dev/og-image.jpg" />
+    <meta name="twitter:image:alt" content="SignValid - Indian Digital Signature Verification Tool" />
+
+    <!-- Mobile Browsers & App Manifest -->
+    <meta name="theme-color" content="#126B44" />
+    <meta name="application-name" content="SignValid" />
+    <meta name="apple-mobile-web-app-title" content="SignValid" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Structured Data (JSON-LD) for Google Rich Snippets & Search Cards -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "@id": "https://signvalid.pages.dev/#webapp",
+          "name": "SignValid",
+          "url": "https://signvalid.pages.dev/",
+          "applicationCategory": "UtilityApplication",
+          "operatingSystem": "All",
+          "browserRequirements": "Requires JavaScript. Works on all modern web browsers.",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "INR"
+          },
+          "description": "Free online client-side cryptographic digital signature validator for Indian government PDFs (e-Aadhaar, e-District certificates, DigiLocker, PAN e-cards) against official CCA India root trust hierarchy under IT Act 2000.",
+          "featureList": [
+            "PKCS#7 cryptographic digital signature extraction",
+            "Controller of Certifying Authorities (CCA) India Root 2014 chain validation",
+            "SHA-256 / SHA-1 message digest integrity checking",
+            "e-Aadhaar, e-District, DigiLocker, PAN, Form 16 verification",
+            "100% ephemeral in-memory privacy (zero files saved or uploaded to servers)",
+            "Universal green checkmark display copy generation"
+          ]
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://signvalid.pages.dev/#organization",
+          "name": "SignValid",
+          "url": "https://signvalid.pages.dev/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://signvalid.pages.dev/og-image.jpg",
+            "width": 1200,
+            "height": 630
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://signvalid.pages.dev/#faq",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Why does Adobe Acrobat Reader show 'Validity Unknown' or a yellow question mark on Indian government documents?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Adobe Acrobat Reader relies on its proprietary Adobe Approved Trust List (AATL). Because the Indian Controller of Certifying Authorities (CCA) root certificate is not pre-installed in default Adobe global trust stores, Adobe displays a yellow question mark '? Validity Unknown'—even though the digital signature is 100% genuine, untampered, and legally recognized under Section 3 of India's IT Act 2000."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Are my confidential files uploaded or saved on any server?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "No. Never. SignValid operates on a strict zero-retention client-side architecture. All cryptographic SHA-256 hashing, PKCS#7 signature extraction, and X.509 certificate path verification run entirely inside your browser's local RAM. Files are never saved, stored, or transmitted to any server."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Which Indian government documents are supported by SignValid?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "SignValid supports all digital PDFs issued by Indian central and state government authorities containing an embedded digital signature, including UIDAI e-Aadhaar cards, Income Tax PAN e-cards, state e-District certificates (caste, income, nativity, domicile), DigiLocker marksheets, and land revenue records."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Is SignValid compliant with the Information Technology Act 2000 of India?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes. SignValid strictly adheres to the Controller of Certifying Authorities (CCA) guidelines, RFC 5280, RFC 3161, and ISO 32000-1 specifications recognized under Section 3 and Section 4 of the Information Technology Act, 2000 of the Republic of India."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">

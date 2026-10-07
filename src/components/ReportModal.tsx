@@ -233,6 +233,9 @@ export const ReportModal: React.FC<ReportModalProps> = ({
                 type="password"
                 placeholder="Password"
                 value={passwordInput}
+                maxLength={64}
+                autoComplete="off"
+                spellCheck={false}
                 onChange={(e) => setPasswordInput(e.target.value)}
                 style={{ flex: 1, padding: '6px 10px', borderRadius: 'var(--radius-sm)', border: '1px solid #D97706' }}
               />

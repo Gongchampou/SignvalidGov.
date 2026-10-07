@@ -18,6 +18,8 @@ import { Toast } from './components/Toast';
 import type { ToastMessage } from './components/Toast';
 import type { ValidatedFile } from './types';
 import { verifyPdf } from './verify/verifyPdf';
+import { securityRateLimiter } from './security/rateLimiter';
+import { runWithSecurityTimeout } from './security/sanitizer';
 
 export const App: React.FC = () => {
   // Navigation Page State with URL hash sync
@@ -106,6 +108,20 @@ export const App: React.FC = () => {
   const handleFilesSelected = async (files: File[]) => {
     if (files.length === 0) return;
 
+    // Security Rate Limiter Evaluation (1/sec, 6 certs/min)
+    const rateCheck = securityRateLimiter.evaluateVerification(files.length);
+    if (!rateCheck.allowed) {
+      addToast(rateCheck.message, 'error');
+      return;
+    }
+
+    if (rateCheck.message) {
+      addToast(rateCheck.message, 'warning');
+    }
+
+    const filesToProcess = files.slice(0, rateCheck.allowedCount);
+    if (filesToProcess.length === 0) return;
+
     // Immediately switch to validate page so user sees progress and results
     navigateTo('validate');
     setIsProcessing(true);
@@ -113,16 +129,21 @@ export const App: React.FC = () => {
     try {
       const results: ValidatedFile[] = [];
 
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
+      for (let i = 0; i < filesToProcess.length; i++) {
+        const file = filesToProcess[i];
         setProcessingFileName(file.name);
         setProcessingProgress(10);
-        setProcessingStep(`Inspecting file ${i + 1} of ${files.length}...`);
+        setProcessingStep(`Inspecting file ${i + 1} of ${filesToProcess.length}...`);
 
-        const validated = await verifyPdf(file, (percent, step) => {
-          setProcessingProgress(percent);
-          setProcessingStep(step);
-        });
+        // Security: Wrap verification in a 25-second timeout to prevent ReDoS / decompression hang
+        const validated = await runWithSecurityTimeout(
+          verifyPdf(file, (percent, step) => {
+            setProcessingProgress(percent);
+            setProcessingStep(step);
+          }),
+          25000,
+          `Security Timeout: "${file.name}" took longer than 25 seconds. Operation halted for protection.`
+        );
 
         results.push(validated);
 
@@ -161,6 +182,13 @@ export const App: React.FC = () => {
 
   // Instant testing with pre-computed official samples
   const handleSelectSample = (sampleDoc: Omit<ValidatedFile, 'id' | 'uploadDate'>) => {
+    // Security rate check on sample trigger
+    const sampleRateCheck = securityRateLimiter.evaluateSampleTest();
+    if (!sampleRateCheck.allowed) {
+      addToast(sampleRateCheck.message, 'error');
+      return;
+    }
+
     navigateTo('validate');
     setIsProcessing(true);
     setProcessingFileName(sampleDoc.name);

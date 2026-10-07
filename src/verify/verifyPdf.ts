@@ -14,6 +14,7 @@ import * as pkijs from 'pkijs';
 import { CCA_ROOTS } from '../certs/ccaRoots';
 import { isAlreadyVerifiedPdf } from './stampPdf';
 import type { SignatureReport, ValidatedFile, VerificationStatus, SignatureMetadata } from '../types';
+import { sanitizeCertString, validatePdfBytes } from '../security/sanitizer';
 
 const OID = {
   signedData: '1.2.840.113549.1.7.2',
@@ -436,21 +437,32 @@ export async function verifyPdf(file: File, onProgress: ProgressFn): Promise<Val
   onProgress(10, 'Reading PDF bytes into ephemeral memory...');
   const bytes = new Uint8Array(await file.arrayBuffer());
 
-  if (new TextDecoder('latin1').decode(bytes.subarray(0, 1024)).indexOf('%PDF-') === -1) {
+  // Security: Magic bytes check & anti-polyglot/script injection check
+  const magicCheck = validatePdfBytes(bytes);
+  if (!magicCheck.valid) {
     const emptyMeta: SignatureMetadata = {
-      documentType: 'Unknown File',
+      documentType: 'Security Blocked / Non-PDF',
       signerIdentity: 'None',
       certificateAuthority: 'None',
       timestamp: 'None',
       hashAlgorithm: 'None',
       signatureAlgorithm: 'None',
-      crlOcspStatus: 'Invalid Format',
+      crlOcspStatus: 'Invalid Format / Disguised File',
       certificateSerial: 'None',
       validUntil: 'None',
       ccaTrustChain: [],
       docFingerprint: ''
     };
-    return { ...base, bytes, encrypted: false, sha256: '', signatures: [], status: 'error', summary: 'This file is not a valid PDF.', metadata: emptyMeta };
+    return {
+      ...base,
+      bytes,
+      encrypted: false,
+      sha256: '',
+      signatures: [],
+      status: 'error',
+      summary: magicCheck.reason || 'Security Check Failed: This file is not a valid PDF.',
+      metadata: emptyMeta
+    };
   }
 
   const sha256 = bytesToHex(await digest('SHA-256', bytes)).toLowerCase();
@@ -557,16 +569,16 @@ export async function verifyPdf(file: File, onProgress: ProgressFn): Promise<Val
 
   const sig0 = signatures[0];
   const metadata: SignatureMetadata = {
-    documentType: deduceDocumentType(file.name, sig0.signerName),
-    signerIdentity: sig0.signerName + (sig0.signerOrg ? ` (${sig0.signerOrg})` : ''),
-    certificateAuthority: sig0.issuerName || sig0.trustedRoot || 'Accredited CA / CCA India Root 2014',
-    timestamp: sig0.signingTime || 'Signed date in IST',
+    documentType: sanitizeCertString(deduceDocumentType(file.name, sig0.signerName)),
+    signerIdentity: sanitizeCertString(sig0.signerName + (sig0.signerOrg ? ` (${sig0.signerOrg})` : '')),
+    certificateAuthority: sanitizeCertString(sig0.issuerName || sig0.trustedRoot || 'Accredited CA / CCA India Root 2014'),
+    timestamp: sanitizeCertString(sig0.signingTime || 'Signed date in IST'),
     hashAlgorithm: `${sig0.digestAlgorithm} (Cryptographic Digest)`,
-    signatureAlgorithm: sig0.signatureAlgorithm,
-    crlOcspStatus: sig0.chainOk ? 'Valid · Verified in CCA India Trust Store' : (sig0.problems[0] || 'Unknown status'),
-    certificateSerial: sig0.certSerial || 'N/A',
-    validUntil: sig0.certValidTo || 'N/A',
-    ccaTrustChain: sig0.chain.length > 0 ? sig0.chain : ['India PKI CCA Root (Controller of Certifying Authorities)'],
+    signatureAlgorithm: sanitizeCertString(sig0.signatureAlgorithm),
+    crlOcspStatus: sanitizeCertString(sig0.chainOk ? 'Valid · Verified in CCA India Trust Store' : (sig0.problems[0] || 'Unknown status')),
+    certificateSerial: sanitizeCertString(sig0.certSerial || 'N/A'),
+    validUntil: sanitizeCertString(sig0.certValidTo || 'N/A'),
+    ccaTrustChain: sig0.chain.length > 0 ? sig0.chain.map(c => sanitizeCertString(c)) : ['India PKI CCA Root (Controller of Certifying Authorities)'],
     docFingerprint: sha256
   };
 

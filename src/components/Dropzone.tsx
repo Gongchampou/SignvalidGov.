@@ -50,15 +50,24 @@ export const Dropzone: React.FC<DropzoneProps> = ({
     const MAX_SIZE = 25 * 1024 * 1024; // 25 MB
 
     for (const file of files) {
+      if (file.size === 0) {
+        onErrorToast(`"${file.name}" is an empty file (0 bytes) and cannot be verified.`);
+        continue;
+      }
       if (!file.name.toLowerCase().endsWith('.pdf') && file.type !== 'application/pdf') {
         onErrorToast(`"${file.name}" is not a PDF file. Please upload Indian government PDF documents.`);
         continue;
       }
       if (file.size > MAX_SIZE) {
-        onErrorToast(`"${file.name}" exceeds the 25 MB file size limit.`);
+        onErrorToast(`"${file.name}" exceeds the 25 MB safe file size limit.`);
         continue;
       }
       validPdfs.push(file);
+    }
+
+    if (validPdfs.length > 6) {
+      onErrorToast('Security Rate Limit: Up to 6 certificates can be submitted per batch (limit: 6 certs/min).');
+      validPdfs.length = 6;
     }
 
     if (validPdfs.length > 0) {
