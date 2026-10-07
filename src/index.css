@@ -36,7 +36,7 @@
   --color-body: #4B5563;
   --color-muted: #6B7280;
   --color-light: #9CA3AF;
-  
+
   --bg-page: #FFFFFF;
   --bg-surface: #FFFFFF;
   --bg-subtle: #F9FAFB;
@@ -67,7 +67,9 @@
 }
 
 /* Reset & Box Sizing */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -90,7 +92,12 @@ body {
   flex-direction: column;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-heading);
   color: var(--color-heading);
   font-weight: 700;
@@ -182,7 +189,60 @@ button {
   }
 }
 
+.brand-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  flex-shrink: 0;
+}
 
+.brand-logo-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm, 8px);
+  background: linear-gradient(135deg, #16A34A 0%, #126B44 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  box-shadow: 0 2px 6px rgba(18, 107, 68, 0.25);
+  transition: transform var(--transition-fast);
+  flex-shrink: 0;
+}
+
+@media (max-width: 480px) {
+  .brand-logo-badge {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+.brand-wrapper:hover .brand-logo-badge {
+  transform: scale(1.05);
+}
+
+.brand-name {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--color-heading-dark, #111827);
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .brand-name {
+    font-size: 1.1rem;
+  }
+}
+
+.brand-name span {
+  color: var(--primary-green);
+}
 
 .cca-tag {
   display: inline-flex;
@@ -202,6 +262,7 @@ button {
   .cca-tag span {
     display: none;
   }
+
   .cca-tag {
     padding: 4px;
     border-radius: 50%;
@@ -298,6 +359,97 @@ button {
 }
 
 /* ==========================================================================
+   Mobile Navigation Full Overlay Drawer
+   ========================================================================== */
+.mobile-nav-overlay {
+  position: fixed;
+  top: 54px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(100dvh - 54px);
+  background-color: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px 20px 32px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  border-top: 1px solid var(--border-subtle);
+  animation: mobileNavFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (max-width: 480px) {
+  .mobile-nav-overlay {
+    top: 48px;
+    height: calc(100dvh - 48px);
+    padding: 16px 16px 28px;
+  }
+}
+
+@keyframes mobileNavFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mobile-nav-links {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mobile-nav-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  text-align: right;
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-heading-dark, #0F172A);
+  border-radius: var(--radius-md, 10px);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.mobile-nav-item:hover {
+  background-color: rgba(18, 107, 68, 0.06);
+  color: var(--primary-green);
+}
+
+.mobile-nav-item.active {
+  background-color: var(--primary-green-subtle);
+  color: var(--primary-green);
+  font-weight: 800;
+}
+
+.mobile-nav-footer {
+  padding-top: 16px;
+  margin-top: 16px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.mobile-cta-btn {
+  width: 100%;
+  justify-content: center;
+  padding: 12px 20px;
+  font-size: 0.95rem;
+}
+
+/* ==========================================================================
    Red Running Privacy Ribbon (Marquee Stream from Left to Right)
    ========================================================================== */
 .red-privacy-ribbon {
@@ -343,6 +495,7 @@ button {
   0% {
     transform: translateX(-50%);
   }
+
   100% {
     transform: translateX(0%);
   }
@@ -435,12 +588,14 @@ button {
   }
 
   .hero-input-col {
-    order: 1; /* Input placed ABOVE on mobile */
+    order: 1;
+    /* Input placed ABOVE on mobile */
     width: 100%;
   }
 
   .hero-copy-col {
-    order: 2; /* Wording placed BELOW on mobile */
+    order: 2;
+    /* Wording placed BELOW on mobile */
     width: 100%;
     align-items: center;
     text-align: center;
@@ -486,9 +641,11 @@ button {
     grid-template-columns: 1.15fr 1fr;
     gap: 48px;
   }
+
   .hero-copy-col {
     order: 1;
   }
+
   .hero-input-col {
     order: 2;
     position: sticky;
@@ -683,8 +840,15 @@ button {
 }
 
 @keyframes pulse-ring {
-  0% { transform: scale(1); opacity: 0.8; }
-  100% { transform: scale(2.5); opacity: 0; }
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
 }
 
 .social-proof-link {
@@ -857,7 +1021,7 @@ button {
   padding: 1px 5px;
   font-family: monospace;
   font-size: 0.72rem;
-  box-shadow: 0 1px 0 rgba(0,0,0,0.1);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
 }
 
 /* Quick Sample Selectors */
@@ -974,6 +1138,7 @@ button {
   .results-preview-col {
     order: 1;
   }
+
   .results-details-col {
     order: 2;
   }
@@ -1202,6 +1367,7 @@ button {
     width: 100%;
     justify-content: space-between;
   }
+
   .status-badge-pass,
   .results-header-actions .state-pill.unknown {
     width: 100%;
@@ -1283,12 +1449,14 @@ button {
     flex-direction: column;
     align-items: flex-start;
   }
+
   .comparison-toggle-tabs {
     width: 100%;
     overflow-x: auto;
     padding-bottom: 4px;
     -webkit-overflow-scrolling: touch;
   }
+
   .comp-tab-btn {
     flex-shrink: 0;
   }
@@ -1325,7 +1493,7 @@ button {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   padding: 20px 24px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 @media (max-width: 640px) {
@@ -1348,10 +1516,11 @@ button {
 }
 
 @media (max-width: 520px) {
-  .stamp-preview-display > div {
+  .stamp-preview-display>div {
     flex-direction: column !important;
     align-items: flex-start !important;
   }
+
   .stamp-preview-graphic {
     width: 100%;
     align-items: center;
@@ -1429,6 +1598,7 @@ button {
     flex-direction: column;
     max-width: 100%;
   }
+
   .password-input-row input,
   .password-input-row button {
     width: 100%;
@@ -1589,11 +1759,13 @@ button {
     flex-direction: column;
     align-items: stretch;
   }
+
   .results-actions-primary-btns {
     flex-direction: column;
     align-items: stretch;
     width: 100%;
   }
+
   .download-cta-btn,
   .secondary-action-btn {
     width: 100%;
@@ -1682,7 +1854,9 @@ button {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .progress-track {
@@ -2542,9 +2716,11 @@ button {
     border-radius: var(--radius-md);
     padding: 16px;
   }
+
   .cookie-actions {
     width: 100%;
   }
+
   .cookie-actions button {
     flex: 1;
     text-align: center;
@@ -2553,8 +2729,15 @@ button {
 }
 
 @keyframes slide-up {
-  from { transform: translateY(50px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .cookie-text {
@@ -2619,8 +2802,13 @@ button {
 }
 
 @keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .modal-dialog {
@@ -2650,8 +2838,15 @@ button {
 }
 
 @keyframes zoom-in {
-  from { transform: scale(0.96); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.96);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .modal-header {
@@ -2666,6 +2861,7 @@ button {
   .modal-header {
     padding: 14px 16px;
   }
+
   .modal-title {
     font-size: 1.1rem;
   }
@@ -2724,6 +2920,7 @@ button {
     flex-direction: column-reverse;
     align-items: stretch;
   }
+
   .modal-footer button,
   .modal-footer .download-cta-btn,
   .modal-footer .secondary-action-btn {
@@ -2731,7 +2928,8 @@ button {
     justify-content: center;
     text-align: center;
   }
-  .modal-footer > div {
+
+  .modal-footer>div {
     width: 100%;
     flex-direction: column;
   }
@@ -2783,6 +2981,7 @@ button {
     right: 14px;
     left: 14px;
   }
+
   .toast-item {
     width: 100%;
   }
@@ -2804,8 +3003,15 @@ button {
 }
 
 @keyframes slide-in-right {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 .toast-item.error {
@@ -3113,6 +3319,7 @@ button {
     opacity: 0;
     transform: translateY(6px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -3527,8 +3734,10 @@ button {
 /* About & Legal Inner Sub-Navigation Bar Sticky Container */
 .page-subnav-sticky-wrap {
   position: sticky;
-  top: 54px; /* Docks directly below sticky header on About page (where red ribbon is hidden) */
-  z-index: 90; /* Below header (z-index: 100), so it NEVER scrolls over header */
+  top: 54px;
+  /* Docks directly below sticky header on About page (where red ribbon is hidden) */
+  z-index: 90;
+  /* Below header (z-index: 100), so it NEVER scrolls over header */
   background-color: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -3541,7 +3750,8 @@ button {
 
 @media (max-width: 640px) {
   .page-subnav-sticky-wrap {
-    top: 48px; /* 48px header on mobile */
+    top: 48px;
+    /* 48px header on mobile */
     padding: 8px 0;
     margin-top: -20px;
     margin-bottom: 16px;
@@ -3597,6 +3807,7 @@ button {
     padding: 4px;
     border-radius: var(--radius-lg);
   }
+
   .page-subnav-item {
     padding: 8px 14px;
     font-size: 0.82rem;
@@ -3729,5 +3940,3 @@ button {
   font-size: 0.88rem;
   color: #92400E;
 }
-
-

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ShieldCheck, Check, Menu, X, ArrowRight } from 'lucide-react';
 
 export type NavPage = 'validate' | 'documents' | 'authorities' | 'how-it-works' | 'guides' | 'faq' | 'about';
@@ -13,6 +13,30 @@ export const Header: React.FC<HeaderProps> = ({
   onNavigate
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Prevent background scroll and handle Escape key when mobile navigation is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      const originalBodyOverflow = document.body.style.overflow;
+      const originalHtmlOverflow = document.documentElement.style.overflow;
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          setMobileMenuOpen(false);
+        }
+      };
+
+      window.addEventListener('keydown', handleKeyDown);
+
+      return () => {
+        document.body.style.overflow = originalBodyOverflow;
+        document.documentElement.style.overflow = originalHtmlOverflow;
+        window.removeEventListener('keydown', handleKeyDown);
+      };
+    }
+  }, [mobileMenuOpen]);
 
   const handleNavClick = (page: NavPage, topic?: string) => {
     setMobileMenuOpen(false);
@@ -117,86 +141,77 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         </div>
 
-        {/* Mobile Navigation Drawer */}
+        {/* Mobile Navigation Drawer Overlay */}
         {mobileMenuOpen && (
-          <div style={{
-            padding: '16px 0 24px',
-            borderTop: '1px solid var(--border-subtle)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '8px'
-          }}>
-            <button
-              type="button"
-              className={`nav-link ${currentPage === 'validate' ? 'active' : ''}`}
-              style={{ textAlign: 'left', padding: '10px 14px', fontSize: '1rem', borderRadius: 8, backgroundColor: currentPage === 'validate' ? 'var(--primary-green-subtle)' : 'transparent' }}
-              onClick={() => handleNavClick('validate')}
-            >
-              Validate
-            </button>
-            <button
-              type="button"
-              className={`nav-link ${currentPage === 'documents' ? 'active' : ''}`}
-              style={{ textAlign: 'left', padding: '10px 14px', fontSize: '1rem', borderRadius: 8, backgroundColor: currentPage === 'documents' ? 'var(--primary-green-subtle)' : 'transparent' }}
-              onClick={() => handleNavClick('documents')}
-            >
-              Documents
-            </button>
-            <button
-              type="button"
-              className={`nav-link ${currentPage === 'authorities' ? 'active' : ''}`}
-              style={{ textAlign: 'left', padding: '10px 14px', fontSize: '1rem', borderRadius: 8, backgroundColor: currentPage === 'authorities' ? 'var(--primary-green-subtle)' : 'transparent' }}
-              onClick={() => handleNavClick('authorities')}
-            >
-              Authorities
-            </button>
-            <button
-              type="button"
-              className={`nav-link ${currentPage === 'how-it-works' ? 'active' : ''}`}
-              style={{ textAlign: 'left', padding: '10px 14px', fontSize: '1rem', borderRadius: 8, backgroundColor: currentPage === 'how-it-works' ? 'var(--primary-green-subtle)' : 'transparent' }}
-              onClick={() => handleNavClick('how-it-works')}
-            >
-              How It Works
-            </button>
-            <button
-              type="button"
-              className={`nav-link ${currentPage === 'guides' ? 'active' : ''}`}
-              style={{ textAlign: 'left', padding: '10px 14px', fontSize: '1rem', borderRadius: 8, backgroundColor: currentPage === 'guides' ? 'var(--primary-green-subtle)' : 'transparent' }}
-              onClick={() => handleNavClick('guides')}
-            >
-              Guides
-            </button>
-            <button
-              type="button"
-              className={`nav-link ${currentPage === 'faq' ? 'active' : ''}`}
-              style={{ textAlign: 'left', padding: '10px 14px', fontSize: '1rem', borderRadius: 8, backgroundColor: currentPage === 'faq' ? 'var(--primary-green-subtle)' : 'transparent' }}
-              onClick={() => handleNavClick('faq')}
-            >
-              FAQ
-            </button>
-            <button
-              type="button"
-              className={`nav-link ${currentPage === 'about' ? 'active' : ''}`}
-              style={{ textAlign: 'left', padding: '10px 14px', fontSize: '1rem', borderRadius: 8, backgroundColor: currentPage === 'about' ? 'var(--primary-green-subtle)' : 'transparent' }}
-              onClick={() => handleNavClick('about')}
-            >
-              About
-            </button>
-            <button
-              type="button"
-              className="nav-action-btn"
-              style={{ justifyContent: 'center', marginTop: '10px', padding: '10px 18px' }}
-              onClick={() => handleNavClick('validate')}
-            >
-              <span>Validate PDF</span>
-              <ArrowRight size={15} />
-            </button>
+          <div className="mobile-nav-overlay">
+            <div className="mobile-nav-links">
+              <button
+                type="button"
+                className={`mobile-nav-item ${currentPage === 'validate' ? 'active' : ''}`}
+                onClick={() => handleNavClick('validate')}
+              >
+                Validate
+              </button>
+              <button
+                type="button"
+                className={`mobile-nav-item ${currentPage === 'documents' ? 'active' : ''}`}
+                onClick={() => handleNavClick('documents')}
+              >
+                Documents
+              </button>
+              <button
+                type="button"
+                className={`mobile-nav-item ${currentPage === 'authorities' ? 'active' : ''}`}
+                onClick={() => handleNavClick('authorities')}
+              >
+                Authorities
+              </button>
+              <button
+                type="button"
+                className={`mobile-nav-item ${currentPage === 'how-it-works' ? 'active' : ''}`}
+                onClick={() => handleNavClick('how-it-works')}
+              >
+                How It Works
+              </button>
+              <button
+                type="button"
+                className={`mobile-nav-item ${currentPage === 'guides' ? 'active' : ''}`}
+                onClick={() => handleNavClick('guides')}
+              >
+                Guides
+              </button>
+              <button
+                type="button"
+                className={`mobile-nav-item ${currentPage === 'faq' ? 'active' : ''}`}
+                onClick={() => handleNavClick('faq')}
+              >
+                FAQ
+              </button>
+              <button
+                type="button"
+                className={`mobile-nav-item ${currentPage === 'about' ? 'active' : ''}`}
+                onClick={() => handleNavClick('about')}
+              >
+                About
+              </button>
+            </div>
+
+            <div className="mobile-nav-footer">
+              <button
+                type="button"
+                className="nav-action-btn mobile-cta-btn"
+                onClick={() => handleNavClick('validate')}
+              >
+                <span>Validate PDF</span>
+                <ArrowRight size={15} />
+              </button>
+            </div>
           </div>
         )}
       </div>
 
-      {/* Red Running Privacy Ribbon Bar (Continuous Left-to-Right Stream) - hidden on About / Legal pages */}
-      {currentPage !== 'about' && (
+      {/* Red Running Privacy Ribbon Bar (Continuous Left-to-Right Stream) - hidden on About page AND while mobile menu is open */}
+      {currentPage !== 'about' && !mobileMenuOpen && (
         <div className="red-privacy-ribbon" role="region" aria-label="100% Client-Side In-Memory Privacy Guarantee">
           <div className="ribbon-ticker-track">
             {[1, 2].map((set) => (
