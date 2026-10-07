@@ -16,6 +16,14 @@ interface TermAndCondProps {
  * Written in clean, semantic HTML markup so it is easy to read, maintain, and edit.
  */
 export const TermAndCond: React.FC<TermAndCondProps> = ({ onNavigateToValidate }) => {
+  const scrollToSection = (e: React.MouseEvent, sectionId: string) => {
+    e.preventDefault();
+    const target = document.getElementById(sectionId);
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="terms-page-container">
       {/* ========================================================= */}
@@ -54,43 +62,43 @@ export const TermAndCond: React.FC<TermAndCondProps> = ({ onNavigateToValidate }
         </div>
 
         <div className="terms-toc-grid">
-          <a href="#section-1" className="terms-toc-link">
+          <a href="#section-1" onClick={(e) => scrollToSection(e, 'section-1')} className="terms-toc-link">
             <span style={{ color: 'var(--primary-green)', fontWeight: 700 }}>§1.</span>
             <span>Acceptance & Public Utility Scope</span>
           </a>
-          <a href="#section-2" className="terms-toc-link">
+          <a href="#section-2" onClick={(e) => scrollToSection(e, 'section-2')} className="terms-toc-link">
             <span style={{ color: 'var(--primary-green)', fontWeight: 700 }}>§2.</span>
             <span>Non-Affiliation with Government</span>
           </a>
-          <a href="#section-3" className="terms-toc-link">
+          <a href="#section-3" onClick={(e) => scrollToSection(e, 'section-3')} className="terms-toc-link">
             <span style={{ color: 'var(--primary-green)', fontWeight: 700 }}>§3.</span>
             <span>Ephemeral Client-Side RAM Architecture</span>
           </a>
-          <a href="#section-4" className="terms-toc-link">
+          <a href="#section-4" onClick={(e) => scrollToSection(e, 'section-4')} className="terms-toc-link">
             <span style={{ color: 'var(--primary-green)', fontWeight: 700 }}>§4.</span>
             <span>Universal Display Copies & Flattening</span>
           </a>
-          <a href="#section-5" className="terms-toc-link">
+          <a href="#section-5" onClick={(e) => scrollToSection(e, 'section-5')} className="terms-toc-link">
             <span style={{ color: 'var(--primary-green)', fontWeight: 700 }}>§5.</span>
             <span>Permitted Uses & User Responsibilities</span>
           </a>
-          <a href="#section-6" className="terms-toc-link">
+          <a href="#section-6" onClick={(e) => scrollToSection(e, 'section-6')} className="terms-toc-link">
             <span style={{ color: 'var(--primary-green)', fontWeight: 700 }}>§6.</span>
             <span>Prohibited Activities & Misuse</span>
           </a>
-          <a href="#section-7" className="terms-toc-link">
+          <a href="#section-7" onClick={(e) => scrollToSection(e, 'section-7')} className="terms-toc-link">
             <span style={{ color: 'var(--primary-green)', fontWeight: 700 }}>§7.</span>
             <span>Encrypted PDF Passwords (e-Aadhaar)</span>
           </a>
-          <a href="#section-8" className="terms-toc-link">
+          <a href="#section-8" onClick={(e) => scrollToSection(e, 'section-8')} className="terms-toc-link">
             <span style={{ color: 'var(--primary-green)', fontWeight: 700 }}>§8.</span>
             <span>Disclaimer of Warranties</span>
           </a>
-          <a href="#section-9" className="terms-toc-link">
+          <a href="#section-9" onClick={(e) => scrollToSection(e, 'section-9')} className="terms-toc-link">
             <span style={{ color: 'var(--primary-green)', fontWeight: 700 }}>§9.</span>
             <span>Limitation of Legal Liability</span>
           </a>
-          <a href="#section-10" className="terms-toc-link">
+          <a href="#section-10" onClick={(e) => scrollToSection(e, 'section-10')} className="terms-toc-link">
             <span style={{ color: 'var(--primary-green)', fontWeight: 700 }}>§10.</span>
             <span>Information Technology Act 2000</span>
           </a>

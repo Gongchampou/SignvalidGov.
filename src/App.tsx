@@ -55,30 +55,15 @@ export const App: React.FC = () => {
   // Toasts
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
-  // Sync hash changes (browser back/forward button navigation)
+  // Strip any leftover hash on mount so the domain stays strictly clean (e.g. https://signvalid.pages.dev)
   useEffect(() => {
-    const handleHashChange = () => {
-      const hash = window.location.hash.replace('#/', '').replace('#', '');
-      const [page, sub] = hash.split('/');
-      if (page === 'terms' || sub === 'terms') {
-        setCurrentPage('about');
-        setAboutInitialTab('terms');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else if (page === 'privacy' || sub === 'privacy') {
-        setCurrentPage('about');
-        setAboutInitialTab('privacy');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else if (page === 'about') {
-        setCurrentPage('about');
-        setAboutInitialTab((sub as AboutSubTab) || 'about');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else if (['validate', 'documents', 'authorities', 'how-it-works', 'guides', 'faq'].includes(page)) {
-        setCurrentPage(page as NavPage);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (window.location.hash) {
+      try {
+        window.history.replaceState(null, '', window.location.pathname + window.location.search);
+      } catch {
+        // ignore
       }
-    };
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    }
   }, []);
 
   const navigateTo = (page: NavPage, topic?: string) => {
@@ -86,14 +71,22 @@ export const App: React.FC = () => {
       const targetTab: AboutSubTab = (topic as AboutSubTab) || 'about';
       setCurrentPage('about');
       setAboutInitialTab(targetTab);
-      window.location.hash = targetTab === 'about' ? '#/about' : `#/about/${targetTab}`;
     } else {
       setCurrentPage(page);
-      window.location.hash = `#/${page}`;
       if (topic) {
         setGuidesInitialTopic(topic);
       }
     }
+
+    // Keep address bar strictly on the base domain without appending page paths or hashes
+    if (window.location.hash) {
+      try {
+        window.history.replaceState(null, '', window.location.pathname + window.location.search);
+      } catch {
+        // ignore
+      }
+    }
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -288,7 +281,13 @@ export const App: React.FC = () => {
             onNavigateToValidate={() => navigateTo('validate')}
             onTabChange={(tab) => {
               setAboutInitialTab(tab);
-              window.location.hash = tab === 'about' ? '#/about' : `#/about/${tab}`;
+              if (window.location.hash) {
+                try {
+                  window.history.replaceState(null, '', window.location.pathname + window.location.search);
+                } catch {
+                  // ignore
+                }
+              }
             }}
           />
         )}
