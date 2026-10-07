@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, Check, ExternalLink } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import type { NavPage } from './Header';
 
 interface FooterProps {
@@ -11,33 +11,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
     <footer className="footer-main">
       <div className="container">
         <div className="footer-grid">
-          {/* Column 1: Brand & Mission */}
-          <div>
-            <div
-              className="brand-wrapper"
-              style={{ marginBottom: 14, cursor: 'pointer' }}
-              onClick={() => onNavigate('validate')}
-            >
-              <div className="brand-logo-badge">
-                <Check size={22} strokeWidth={3} />
-              </div>
-              <div className="brand-name">
-                Sign<span>Valid</span>
-              </div>
-            </div>
-            <p style={{ fontSize: '0.88rem', color: 'var(--color-body)', lineHeight: 1.6, maxWidth: 360, marginBottom: 16 }}>
-              The independent cryptographic verification utility for Indian digital government documents. Validating PKCS#7 signatures against the Controller of Certifying Authorities (CCA) root hierarchy.
-            </p>
-            <div
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: '0.78rem', color: 'var(--primary-green)', fontWeight: 600, cursor: 'pointer' }}
-              onClick={() => onNavigate('authorities')}
-            >
-              <ShieldCheck size={16} />
-              <span>Official CCA India Root Trust Store</span>
-            </div>
-          </div>
-
-          {/* Column 2: Quick Pages Navigation */}
+          {/* Column 1: Quick Pages Navigation */}
           <div>
             <h4 className="footer-col-title">Navigation</h4>
             <ul className="footer-nav-list">
@@ -69,7 +43,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             </ul>
           </div>
 
-          {/* Column 3: Guides & Compliance */}
+          {/* Column 2: Guides & Compliance */}
           <div>
             <h4 className="footer-col-title">Verification Guides</h4>
             <ul className="footer-nav-list">
@@ -106,7 +80,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             </ul>
           </div>
 
-          {/* Column 4: About & Legal */}
+          {/* Column 3: About & Legal */}
           <div>
             <h4 className="footer-col-title">About & Legal</h4>
             <ul className="footer-nav-list">
@@ -145,13 +119,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             </ul>
           </div>
         </div>
-
-        {/* Mandatory Legal Notice */}
-        <div className="footer-disclaimer-card">
-          <strong>Mandatory Notice: </strong>
-          SignValid is an independent cryptographic verification utility and is not affiliated with UIDAI, MeitY, the Government of India, or any state government. All files are processed strictly in volatile memory and never stored.
-        </div>
-
+        
         {/* Bottom Credits & Copyright */}
         <div className="footer-bottom-row">
           <div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FileText, Search, CheckCircle2, ArrowRight } from 'lucide-react';
+import { FileText, Search, CheckCircle2, ArrowRight, Globe } from 'lucide-react';
 import { SUPPORTED_DOCUMENTS } from '../data/supportedDocs';
 
 interface DocumentsPageProps {
@@ -100,7 +100,7 @@ export const DocumentsPage: React.FC<DocumentsPageProps> = ({ onNavigateToValida
         <div className="docs-grid">
           {filteredItems.map((doc, idx) => (
             <div key={idx} className="doc-card-item">
-              <div>
+              <div className="doc-card-content">
                 <div className="doc-card-header">
                   <h4 className="doc-card-name">{doc.name}</h4>
                   <CheckCircle2 size={18} color="var(--primary-green)" style={{ flexShrink: 0 }} />
@@ -109,8 +109,13 @@ export const DocumentsPage: React.FC<DocumentsPageProps> = ({ onNavigateToValida
               </div>
 
               <div className="doc-card-footer">
-                <span className="doc-tag-pill">{doc.tag}</span>
-                <span className="doc-portal-link">{doc.portal}</span>
+                <div className="doc-tag-row">
+                  <span className="doc-tag-pill">{doc.tag}</span>
+                </div>
+                <div className="doc-portal-row" title={`Official portal: ${doc.portal}`}>
+                  <Globe size={12} className="doc-portal-icon" />
+                  <span className="doc-portal-link">{doc.portal}</span>
+                </div>
               </div>
             </div>
           ))}

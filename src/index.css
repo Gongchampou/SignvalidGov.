@@ -182,59 +182,7 @@ button {
   }
 }
 
-.brand-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
 
-@media (max-width: 480px) {
-  .brand-wrapper {
-    gap: 7px;
-  }
-}
-
-.brand-logo-badge {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #16A34A 0%, #126B44 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #FFFFFF;
-  box-shadow: 0 2px 8px rgba(18, 107, 68, 0.22);
-  transition: transform var(--transition-fast);
-  flex-shrink: 0;
-}
-
-@media (max-width: 480px) {
-  .brand-logo-badge {
-    width: 28px;
-    height: 28px;
-  }
-}
-
-.brand-wrapper:hover .brand-logo-badge {
-  transform: scale(1.05);
-}
-
-.brand-name {
-  font-size: 1.2rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  color: var(--color-heading-dark);
-}
-
-@media (max-width: 480px) {
-  .brand-name {
-    font-size: 1.05rem;
-  }
-}
-
-.brand-name span {
-  color: var(--primary-green);
-}
 
 .cca-tag {
   display: inline-flex;
@@ -2096,46 +2044,84 @@ button {
   box-shadow: var(--shadow-md);
 }
 
+.doc-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 .doc-card-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 10px;
+  gap: 12px;
 }
 
 .doc-card-name {
   font-size: 1.05rem;
   font-weight: 700;
   color: var(--color-heading-dark);
+  line-height: 1.35;
 }
 
 .doc-card-authority {
   font-size: 0.84rem;
   color: var(--color-muted);
-  margin-top: 4px;
+  line-height: 1.45;
 }
 
 .doc-card-footer {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 12px;
+  flex-direction: column;
+  gap: 9px;
+  padding-top: 14px;
   border-top: 1px solid var(--border-subtle);
-  font-size: 0.78rem;
+  margin-top: auto;
+}
+
+.doc-tag-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .doc-tag-pill {
-  background-color: var(--mint-bg);
-  color: var(--primary-green);
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--mint-bg, #F0FDF4);
+  color: var(--primary-green, #16A34A);
+  font-size: 0.77rem;
   font-weight: 600;
-  padding: 3px 8px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--mint-border);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid var(--mint-border, #BBF7D0);
+  line-height: 1.35;
+  max-width: 100%;
+}
+
+.doc-portal-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.76rem;
+  color: var(--color-muted);
+  min-width: 0;
+}
+
+.doc-portal-icon {
+  flex-shrink: 0;
+  color: var(--primary-green);
+  opacity: 0.85;
 }
 
 .doc-portal-link {
   color: var(--color-muted);
-  font-family: monospace;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.76rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Trusted Certifying Authorities (CCA India) */
@@ -2509,23 +2495,6 @@ button {
 
 .footer-nav-link:hover {
   color: var(--primary-green);
-}
-
-.footer-disclaimer-card {
-  background-color: #FFFFFF;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  padding: 18px 24px;
-  font-size: 0.82rem;
-  color: var(--color-muted);
-  line-height: 1.55;
-  margin-bottom: 28px;
-}
-
-@media (max-width: 640px) {
-  .footer-disclaimer-card {
-    padding: 14px 16px;
-  }
 }
 
 .footer-bottom-row {
