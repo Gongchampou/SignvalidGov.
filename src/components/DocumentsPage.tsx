@@ -44,44 +44,32 @@ export const DocumentsPage: React.FC<DocumentsPageProps> = ({ onNavigateToValida
         </div>
       </div>
 
-      <div className="container" style={{ paddingTop: 36, paddingBottom: 60 }}>
-        {/* Search Bar */}
-        <div style={{ maxWidth: 650, margin: '0 auto 28px', display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            backgroundColor: '#FFFFFF',
-            border: '1px solid var(--border-subtle)',
-            borderRadius: 'var(--radius-full)',
-            padding: '10px 20px',
-            boxShadow: 'var(--shadow-sm)'
-          }}>
-            <Search size={18} color="var(--color-muted)" style={{ marginRight: 10 }} />
+      {/* Sticky Translucent Search Area */}
+      <div className="doc-search-sticky-wrap">
+        <div className="container">
+          <div className="doc-search-box">
+            <Search size={18} className="doc-search-icon" />
             <input
               type="text"
+              className="doc-search-input"
               placeholder="Search e-Aadhaar, Seva Sindhu, DigiLocker, PAN, Caste Certificate..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              style={{
-                border: 'none',
-                outline: 'none',
-                width: '100%',
-                fontSize: '0.92rem',
-                color: 'var(--color-heading-dark)'
-              }}
             />
             {searchQuery && (
               <button
                 type="button"
+                className="doc-search-clear-btn"
                 onClick={() => setSearchQuery('')}
-                style={{ fontSize: '0.8rem', color: 'var(--color-muted)', padding: '2px 8px', cursor: 'pointer', background: 'none', border: 'none' }}
               >
                 Clear
               </button>
             )}
           </div>
         </div>
+      </div>
 
+      <div className="container" style={{ paddingTop: 20, paddingBottom: 60 }}>
         {/* Category Pill Tabs */}
         <div className="supported-category-tabs">
           {categories.map((cat) => (
