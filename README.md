@@ -11,6 +11,20 @@
 
 It permanently fixes the notorious Adobe Acrobat **`? Validity Unknown`** warning by verifying cryptographic signatures and generating an authentic universal display copy embedded with a permanent **`✓ Signature Valid`** green checkmark—viewable on mobile phones, web browsers, and paper printouts.
 
+<table>
+  <tr>
+    <td align="center">
+      <img src="src/images/unverified.png" alt="Unknown signature" width="200">
+    </td>
+    <td align="center">
+      <strong style="font-size: 40px;">────────────────→</strong>
+    </td>
+    <td align="center">
+      <img src="src/images/verified.jpg" alt="Verified signature" width="200">
+    </td>
+  </tr>
+</table>
+
 ---
 
 ## 📌 Table of Contents
