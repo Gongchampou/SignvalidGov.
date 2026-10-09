@@ -376,16 +376,16 @@ export const PdfLivePreview: React.FC<PdfLivePreviewProps> = ({
       {/* Main Preview Area */}
       <div className="pdf-preview-stage">
         {loading || isStamping ? (
-          <div className="pdf-preview-loading">
-            <div className="spinner-ring" style={{ width: 42, height: 42, borderWidth: 3 }} />
-            <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--color-heading)' }}>
+          <div className="pdf-preview-loading" style={{ margin: 'auto', textAlign: 'center', width: '100%' }}>
+            <div className="spinner-ring" style={{ width: 42, height: 42, borderWidth: 3, margin: '0 auto 12px' }} />
+            <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--color-heading)', textAlign: 'center', display: 'block' }}>
               {isStamping ? 'Stamping green tick onto original document...' : 'Rendering live PDF preview...'}
             </span>
           </div>
         ) : errorMsg ? (
-          <div className="pdf-preview-error">
-            <AlertCircle size={24} color="#EF4444" />
-            <span>{errorMsg}</span>
+          <div className="pdf-preview-error" style={{ margin: 'auto', textAlign: 'center', width: '100%' }}>
+            <AlertCircle size={24} color="#EF4444" style={{ margin: '0 auto 8px' }} />
+            <span style={{ textAlign: 'center', display: 'block' }}>{errorMsg}</span>
           </div>
         ) : (
           <div className="pdf-canvas-wrapper">

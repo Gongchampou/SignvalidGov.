@@ -3362,13 +3362,23 @@ button {
 
 .pdf-preview-loading,
 .pdf-preview-error {
+  margin: auto;
+  width: 100%;
+  max-width: 480px;
+  min-height: 240px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  padding: 40px;
+  gap: 16px;
+  padding: 40px 20px;
   text-align: center;
+  align-self: center;
+  justify-self: center;
+}
+
+.pdf-preview-loading .spinner-ring {
+  margin: 0 auto 12px;
 }
 
 .pdf-preview-bottom-bar {
