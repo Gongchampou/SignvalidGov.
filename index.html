@@ -9,8 +9,28 @@
     <meta name="keywords" content="SignValid, digital signature validator, digital signature checker, PDF signature validator, PDF digital signature checker, DSC validator, DSC checker, Indian digital signature, digital signature validity, validity unknown, digital signature verification"/>
     <meta name="description" content="Validate Indian government PDF signatures (e-Aadhaar, e-District, e-Seba, DigiLocker, PAN e-card) against India CCA root trust store and fix the yellow question mark." />
     <meta name="google-site-verification" content="_uBAwnlg1FOwEBRLe4LOsDasSqsd4k3dJWOF8Ehyfkw" />
+    <meta name="theme-color" content="#FFFFFF" id="theme-color-meta" />
     <title>SignValid — Validate Indian Digital Signatures & Fix Validity Unknown</title>
     <link rel="canonical" href="https://signvalid.pages.dev/" />
+
+    <!-- Instant Theme Initializer (Prevents FOUC) -->
+    <script>
+      (function() {
+        try {
+          var t = localStorage.getItem('signvalid-theme');
+          var isDark = t === 'dark' || (!t && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          if (isDark) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            document.documentElement.classList.add('dark');
+            var meta = document.getElementById('theme-color-meta');
+            if (meta) meta.setAttribute('content', '#0B0F17');
+          } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+            document.documentElement.classList.remove('dark');
+          }
+        } catch(e) {}
+      })();
+    </script>
 
     <!-- Security: Anti-Clickjacking, CSP & MIME Protection -->
     <meta http-equiv="X-Frame-Options" content="DENY" />

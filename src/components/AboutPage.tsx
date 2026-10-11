@@ -209,13 +209,13 @@ export const AboutPage: React.FC<AboutPageProps> = ({
                 Under Section 4 and Section 5 of the Information Technology Act 2000, electronic records and digital signatures authenticated through licensed Certifying Authorities under the Controller of Certifying Authorities (CCA) have legal recognition and equivalence to handwritten physical signatures.
               </p>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
-                <div style={{ backgroundColor: '#FFFFFF', padding: '16px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
+                <div style={{ backgroundColor: 'var(--bg-surface)', padding: '16px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
                   <strong style={{ color: 'var(--color-heading-dark)' }}>Section 4 (Legal Recognition):</strong>
                   <p style={{ fontSize: '0.84rem', color: 'var(--color-muted)', margin: '6px 0 0 0' }}>
                     Where any law provides that information shall be in writing or in physical form, such requirement is deemed satisfied if rendered in electronic form.
                   </p>
                 </div>
-                <div style={{ backgroundColor: '#FFFFFF', padding: '16px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
+                <div style={{ backgroundColor: 'var(--bg-surface)', padding: '16px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
                   <strong style={{ color: 'var(--color-heading-dark)' }}>Section 5 (Digital Signatures):</strong>
                   <p style={{ fontSize: '0.84rem', color: 'var(--color-muted)', margin: '6px 0 0 0' }}>
                     Where any law provides that information shall be authenticated by affixing a signature, such requirement is deemed satisfied by digital signature.
@@ -227,7 +227,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({
             {/* Transparency Disclaimer */}
             <div className="about-disclaimer-box">
               <strong>Non-Government Affiliation Disclaimer:</strong>
-              <p style={{ margin: '6px 0 0 0', fontSize: '0.84rem', color: '#6B7280' }}>
+              <p style={{ margin: '6px 0 0 0', fontSize: '0.84rem', color: 'var(--color-muted)' }}>
                 SignValid is an independent cryptographic verification utility. It is not affiliated with, maintained by, or operated by UIDAI, MeitY, the Controller of Certifying Authorities, or any central or state government portal. All verification uses publicly verifiable cryptographic standards and root certificates published by cca.gov.in.
               </p>
             </div>

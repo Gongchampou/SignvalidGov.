@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldCheck, Check, Menu, X, ArrowRight } from 'lucide-react';
+import { ThemeToggle } from './ThemeToggle';
 
 export type NavPage = 'validate' | 'documents' | 'authorities' | 'how-it-works' | 'guides' | 'faq' | 'about';
 
@@ -120,6 +121,9 @@ export const Header: React.FC<HeaderProps> = ({
               About
             </button>
 
+            {/* Theme Toggle Button */}
+            <ThemeToggle />
+
             <button
               type="button"
               className="nav-action-btn"
@@ -130,15 +134,18 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           </nav>
 
-          {/* Mobile Menu Hamburger Button */}
-          <button
-            type="button"
-            className="mobile-menu-toggle"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle Menu"
-          >
-            {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
-          </button>
+          {/* Mobile Right Controls: Theme Toggle & Hamburger Button */}
+          <div className="header-mobile-actions">
+            <ThemeToggle />
+            <button
+              type="button"
+              className="mobile-menu-toggle"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle Menu"
+            >
+              {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Navigation Drawer Overlay */}
@@ -197,6 +204,10 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
 
             <div className="mobile-nav-footer">
+              <div className="mobile-nav-theme-row">
+                <span className="mobile-nav-theme-label">Theme Appearance</span>
+                <ThemeToggle showLabel />
+              </div>
               <button
                 type="button"
                 className="nav-action-btn mobile-cta-btn"
