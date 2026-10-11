@@ -1,8 +1,7 @@
 import React from 'react';
 import {
   Check,
-  ArrowRight,
-  Sparkles
+  ArrowRight
 } from 'lucide-react';
 import { Dropzone } from './Dropzone';
 import { VerificationProgress } from './VerificationProgress';
@@ -60,10 +59,10 @@ export const Hero: React.FC<HeroProps> = ({
           <div className="hero-grid">
             {/* Left Column (Desktop) / Bottom Column (Mobile): Copy & Value Propositions */}
             <div className="hero-copy-col">
-              <div className="hero-pill-badge">
+              {/*<div className="hero-pill-badge">
                 <Sparkles size={14} />
                 <span>Validate Indian government PDF signatures — and fix the yellow question mark for good.</span>
-              </div>
+              </div>*/}
 
               <h1 className="hero-title">
                 Validate Indian Digital Signatures

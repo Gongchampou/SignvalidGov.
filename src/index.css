@@ -3185,15 +3185,6 @@ button {
   position: relative;
 }
 
-.pdf-live-preview-box.is-fullscreen {
-  position: fixed;
-  inset: 0;
-  z-index: 2500;
-  background-color: #0F172A;
-  border-radius: 0;
-  height: 100vh;
-  width: 100vw;
-}
 
 .pdf-preview-toolbar {
   padding: 12px 20px;
@@ -3362,11 +3353,6 @@ button {
   }
 }
 
-.pdf-live-preview-box.is-fullscreen .pdf-preview-stage {
-  max-height: calc(100vh - 120px);
-  min-height: calc(100vh - 120px);
-  background-color: #0F172A;
-}
 
 .pdf-canvas-wrapper {
   margin: auto;

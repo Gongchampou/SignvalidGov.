@@ -8,8 +8,6 @@ import {
   ChevronRight,
   ZoomIn,
   ZoomOut,
-  Maximize2,
-  Minimize2,
   Download,
   Sparkles,
   ExternalLink
@@ -36,7 +34,6 @@ export const PdfLivePreview: React.FC<PdfLivePreviewProps> = ({
   const [zoom, setZoom] = useState<number>(1.0);
   const [loading, setLoading] = useState<boolean>(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [stampedBytes, setStampedBytes] = useState<Uint8Array | null>(null);
   const [isStamping, setIsStamping] = useState<boolean>(false);
 
@@ -240,10 +237,6 @@ export const PdfLivePreview: React.FC<PdfLivePreviewProps> = ({
     setZoom(1.0);
   };
 
-  const toggleFullscreen = () => {
-    setIsFullscreen(!isFullscreen);
-  };
-
   const handleOpenInNewTab = () => {
     const bytesToOpen = (viewMode === 'stamped' && stampedBytes) ? stampedBytes : file.bytes;
     const blob = new Blob([bytesToOpen as unknown as BlobPart], { type: 'application/pdf' });
@@ -254,7 +247,7 @@ export const PdfLivePreview: React.FC<PdfLivePreviewProps> = ({
   return (
     <div
       ref={containerRef}
-      className={`pdf-live-preview-box ${isFullscreen ? 'is-fullscreen' : ''}`}
+      className="pdf-live-preview-box"
     >
       {/* Top Header Controls Bar */}
       <div className="pdf-preview-toolbar">
@@ -350,7 +343,7 @@ export const PdfLivePreview: React.FC<PdfLivePreviewProps> = ({
             </button>
           </div>
 
-          {/* New Tab / Fullscreen */}
+          {/* Open full PDF in new tab */}
           <div className="pdf-view-actions">
             <button
               type="button"
@@ -359,15 +352,6 @@ export const PdfLivePreview: React.FC<PdfLivePreviewProps> = ({
               title="Open full PDF in new browser tab"
             >
               <ExternalLink size={15} />
-            </button>
-
-            <button
-              type="button"
-              className="pdf-tool-btn"
-              onClick={toggleFullscreen}
-              title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen Preview'}
-            >
-              {isFullscreen ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
             </button>
           </div>
         </div>
