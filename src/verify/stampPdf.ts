@@ -405,11 +405,18 @@ export async function createGreenTickCopy(file: ValidatedFile, password?: string
 }
 
 export function downloadBytes(bytes: Uint8Array, filename: string) {
+  // Defensive filename sanitization (prevent path traversal, null bytes, and control characters)
+  const safeFilename = filename
+    .replace(/[/\\?%*:|"<>]/g, '_')
+    .replace(/[\x00-\x1F\x7F]/g, '')
+    .trim()
+    .slice(0, 150) || 'document_verified.pdf';
+
   const blob = new Blob([bytes as BlobPart], { type: 'application/pdf' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = filename;
+  a.download = safeFilename;
   document.body.appendChild(a);
   a.click();
   a.remove();
