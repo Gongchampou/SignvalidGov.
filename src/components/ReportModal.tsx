@@ -276,7 +276,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({
               style={{ fontSize: '0.82rem' }}
             >
               <FileCheck size={15} />
-              <span>1-Page Summary Certificate</span>
+              <span>Summary Certificate</span>
             </button>
 
             {file.status === 'already_verified' ? (
@@ -287,7 +287,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({
                 title="Save verified PDF (already contains permanent green checkmark)"
               >
                 <Download size={16} />
-                <span>Download Verified PDF (Green Tick Embedded ✓)</span>
+                <span>Download Verified PDF</span>
               </button>
             ) : file.status === 'unsigned' ? (
               <button
@@ -298,7 +298,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({
                 title="Cannot stamp: Missing digital signature"
               >
                 <AlertCircle size={16} />
-                <span>Cannot Stamp (Missing Signature)</span>
+                <span>Missing Signature</span>
               </button>
             ) : (
               <button
@@ -308,7 +308,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({
                 disabled={isStamping}
               >
                 <Download size={16} />
-                <span>{isStamping ? 'Stamping Green Tick...' : 'Download Validated PDF (with Green Tick ✓)'}</span>
+                <span>{isStamping ? 'Stamping PDF...' : 'Download Validated PDF'}</span>
               </button>
             )}
           </div>

@@ -393,22 +393,66 @@ button {
   box-shadow: 0 4px 12px rgba(18, 107, 68, 0.3);
 }
 
-.mobile-menu-toggle {
+.header-mobile-actions {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  border-radius: var(--radius-sm, 6px);
-  color: var(--color-heading);
-  border: 1px solid var(--border-subtle);
+  gap: 8px;
   flex-shrink: 0;
+}
+
+.mobile-menu-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md, 8px);
+  color: var(--color-heading);
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+}
+
+.mobile-menu-toggle:hover {
+  background-color: var(--bg-subtle);
+  border-color: var(--border-medium);
+}
+
+@media (max-width: 480px) {
+  .header-mobile-actions {
+    gap: 6px;
+  }
+
+  .mobile-menu-toggle {
+    width: 34px;
+    height: 34px;
+  }
+
+  .header-mobile-actions .theme-toggle-btn {
+    padding: 2px;
+  }
+
+  .header-mobile-actions .theme-toggle-track {
+    width: 46px;
+    height: 25px;
+  }
+
+  .header-mobile-actions .theme-toggle-thumb {
+    width: 19px;
+    height: 19px;
+  }
+
+  .header-mobile-actions .theme-toggle-btn.is-dark .theme-toggle-thumb {
+    transform: translateX(21px);
+  }
 }
 
 @media (min-width: 960px) {
   .mobile-menu-toggle,
   .header-mobile-actions {
-    display: none;
+    display: none !important;
   }
 }
 
@@ -465,8 +509,8 @@ button {
 .mobile-nav-item {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  text-align: right;
+  justify-content: flex-start;
+  text-align: left;
   width: 100%;
   padding: 12px 16px;
   font-size: 1.05rem;
@@ -1160,17 +1204,35 @@ button {
   background-color: #F8FAFC;
 }
 
-@media (min-width: 768px) {
+@media (max-width: 640px) {
+  .results-split-layout {
+    padding: 12px 10px 18px 10px;
+    gap: 14px;
+  }
+}
+
+/* Tablet Portrait (768px - 959px): Generous stacked layout where PDF is large and legible */
+@media (min-width: 768px) and (max-width: 959px) {
+  .results-split-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 20px;
+  }
+}
+
+/* Desktop & Tablet Landscape: 2-column side-by-side split grid */
+@media (min-width: 960px) {
   .results-split-layout {
     display: grid;
-    grid-template-columns: 1fr minmax(360px, 440px);
+    grid-template-columns: 1.2fr minmax(380px, 440px);
     gap: 24px;
     align-items: start;
     padding: 24px;
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1200px) {
   .results-split-layout {
     grid-template-columns: 1.25fr minmax(420px, 480px);
     gap: 28px;
@@ -1186,8 +1248,8 @@ button {
   }
 }
 
-/* On mobile (< 768px): Show PDF Preview first, then details & downloads */
-@media (max-width: 767px) {
+/* On mobile and tablet portrait (< 960px): Show PDF Preview first, then details & downloads */
+@media (max-width: 959px) {
   .results-preview-col {
     order: 1;
   }
@@ -1276,7 +1338,7 @@ button {
   min-width: 0;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 960px) {
   .results-preview-col {
     position: sticky;
     top: 114px;
@@ -1824,6 +1886,17 @@ button {
     width: 100%;
     justify-content: center;
     text-align: center;
+    padding: 11px 16px;
+    font-size: 0.88rem;
+    white-space: normal;
+    word-break: normal;
+    box-sizing: border-box;
+  }
+
+  .download-cta-btn span,
+  .secondary-action-btn span {
+    white-space: normal;
+    line-height: 1.25;
   }
 }
 
@@ -1846,10 +1919,18 @@ button {
   border-radius: var(--radius-full);
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   transition: all var(--transition-fast);
   box-shadow: 0 4px 12px rgba(18, 107, 68, 0.25);
+  box-sizing: border-box;
+  max-width: 100%;
   white-space: nowrap;
+}
+
+.download-cta-btn span {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .download-cta-btn:hover {
@@ -1868,8 +1949,11 @@ button {
   border-radius: var(--radius-full);
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   transition: all var(--transition-fast);
+  box-sizing: border-box;
+  max-width: 100%;
   white-space: nowrap;
 }
 
@@ -4197,17 +4281,64 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 14px;
+  padding: 12px 16px;
   background-color: var(--bg-subtle);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg, 14px);
   margin-bottom: 14px;
   border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  user-select: none;
+}
+
+.mobile-nav-theme-row:hover {
+  background-color: rgba(18, 107, 68, 0.06);
+  border-color: var(--mint-border);
+}
+
+.mobile-nav-theme-row:active {
+  transform: scale(0.99);
+}
+
+.mobile-nav-theme-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mobile-nav-theme-icon-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md, 10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #FEF3C7;
+  color: #D97706;
+  border: 1px solid #FDE68A;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.mobile-nav-theme-text-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
 }
 
 .mobile-nav-theme-label {
-  font-size: 0.92rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: var(--color-heading-dark);
+  line-height: 1.2;
+}
+
+.mobile-nav-theme-sublabel {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--color-muted);
+  line-height: 1.2;
 }
 
 /* ==========================================================================
@@ -4228,8 +4359,45 @@ button {
   border-top-color: var(--border-subtle);
 }
 
+[data-theme="dark"] .mobile-nav-item {
+  color: var(--color-heading);
+}
+
 [data-theme="dark"] .mobile-nav-item:hover {
   background-color: rgba(16, 185, 129, 0.12);
+  color: var(--primary-green);
+}
+
+[data-theme="dark"] .mobile-nav-item.active {
+  background-color: rgba(16, 185, 129, 0.18);
+  color: #34D399;
+}
+
+[data-theme="dark"] .mobile-nav-theme-row {
+  background-color: #162032;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .mobile-nav-theme-row:hover {
+  background-color: #1E293B;
+  border-color: var(--primary-green);
+}
+
+[data-theme="dark"] .mobile-nav-theme-icon-badge {
+  background-color: rgba(16, 185, 129, 0.16);
+  color: #34D399;
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+[data-theme="dark"] .mobile-menu-toggle {
+  background-color: #162032;
+  border-color: #334155;
+  color: var(--color-heading);
+}
+
+[data-theme="dark"] .mobile-menu-toggle:hover {
+  background-color: #1E293B;
+  border-color: var(--primary-green);
 }
 
 [data-theme="dark"] .hero-section {

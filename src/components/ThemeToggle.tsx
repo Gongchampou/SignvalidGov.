@@ -17,7 +17,10 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
     <button
       type="button"
       className={`theme-toggle-btn ${isDark ? 'is-dark' : 'is-light'} ${className}`}
-      onClick={toggleTheme}
+      onClick={(e) => {
+        e.stopPropagation();
+        toggleTheme();
+      }}
       aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode (Alt+T)`}
       title={`Switch to ${isDark ? 'light' : 'dark'} mode (Alt+T)`}
     >

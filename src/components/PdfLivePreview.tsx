@@ -256,12 +256,12 @@ export const PdfLivePreview: React.FC<PdfLivePreviewProps> = ({
           {file.status === 'already_verified' ? (
             <div className="pdf-mode-btn active" style={{ cursor: 'default' }}>
               <CheckCircle2 size={14} color="#FFFFFF" />
-              <span>Already Verified (Permanent Green Tick ✓ Active)</span>
+              <span>Already Verified (✓)</span>
             </div>
           ) : file.status === 'unsigned' ? (
             <div className="pdf-mode-btn" style={{ borderColor: '#FECACA', color: '#B91C1C', cursor: 'default', backgroundColor: '#FEF2F2' }}>
               <AlertCircle size={14} color="#DC2626" />
-              <span>Missing Signature (Unsigned Document)</span>
+              <span>Missing Signature</span>
             </div>
           ) : (
             <>
@@ -272,7 +272,7 @@ export const PdfLivePreview: React.FC<PdfLivePreviewProps> = ({
                 disabled={isStamping}
               >
                 <CheckCircle2 size={14} color={viewMode === 'stamped' ? '#FFFFFF' : '#16A34A'} />
-                <span>Verified Live Copy (Green Tick ✓)</span>
+                <span>Verified Copy (✓)</span>
               </button>
 
               <button

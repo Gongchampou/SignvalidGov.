@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, Check, Menu, X, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Check, Menu, X, ArrowRight, Sun, Moon } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
+import { useTheme } from '../context/ThemeContext';
 
 export type NavPage = 'validate' | 'documents' | 'authorities' | 'how-it-works' | 'guides' | 'faq' | 'about';
 
@@ -14,6 +15,7 @@ export const Header: React.FC<HeaderProps> = ({
   onNavigate
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { toggleTheme, isDark } = useTheme();
 
   // Prevent background scroll and handle Escape key when mobile navigation is open
   useEffect(() => {
@@ -204,9 +206,29 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
 
             <div className="mobile-nav-footer">
-              <div className="mobile-nav-theme-row">
-                <span className="mobile-nav-theme-label">Theme Appearance</span>
-                <ThemeToggle showLabel />
+              <div
+                className="mobile-nav-theme-row"
+                onClick={() => toggleTheme()}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleTheme();
+                  }
+                }}
+                aria-label={`Toggle theme appearance. Current mode: ${isDark ? 'Dark' : 'Light'}`}
+              >
+                <div className="mobile-nav-theme-info">
+                  <div className="mobile-nav-theme-icon-badge">
+                    {isDark ? <Moon size={16} strokeWidth={2.4} /> : <Sun size={16} strokeWidth={2.4} />}
+                  </div>
+                  <div className="mobile-nav-theme-text-col">
+                    <span className="mobile-nav-theme-label">Appearance</span>
+                    <span className="mobile-nav-theme-sublabel">{isDark ? 'Dark Mode' : 'Light Mode'}</span>
+                  </div>
+                </div>
+                <ThemeToggle />
               </div>
               <button
                 type="button"

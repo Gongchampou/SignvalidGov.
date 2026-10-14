@@ -366,7 +366,7 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
                       title="Save verified PDF (already contains permanent green checkmark)"
                     >
                       <Download size={18} />
-                      <span>Download Verified PDF (Green Tick Embedded ✓)</span>
+                      <span>Download Verified PDF</span>
                     </button>
                   ) : currentDoc.status === 'unsigned' ? (
                     <button
@@ -377,7 +377,7 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
                       title="Cannot stamp: Missing digital signature"
                     >
                       <AlertCircle size={18} />
-                      <span>Cannot Stamp (Missing Signature)</span>
+                      <span>Missing Signature</span>
                     </button>
                   ) : (
                     <button
@@ -385,10 +385,10 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
                       className="download-cta-btn"
                       onClick={() => handleDownloadStampedPdf()}
                       disabled={isStamping}
-                      title={`Download ${currentDoc.name} with all pages preserved and yellow '?' replaced by green tick ✓`}
+                      title={`Download ${currentDoc.name} with all pages preserved and green tick ✓ stamped`}
                     >
                       <Download size={18} />
-                      <span>{isStamping ? 'Stamping Green Tick...' : 'Download Validated PDF (with Green Tick ✓)'}</span>
+                      <span>{isStamping ? 'Stamping PDF...' : 'Download Validated PDF'}</span>
                     </button>
                   )}
 
@@ -398,7 +398,7 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
                     onClick={() => onOpenReportModal(currentDoc)}
                   >
                     <Eye size={16} />
-                    <span>View Full Verification Audit</span>
+                    <span>View Audit Report</span>
                   </button>
 
                   <button
@@ -409,7 +409,7 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
                     style={{ fontSize: '0.82rem' }}
                   >
                     <FileCheck size={15} />
-                    <span>1-Page Summary Certificate</span>
+                    <span>Summary Certificate</span>
                   </button>
                 </div>
 
@@ -421,7 +421,7 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({
                   title="Reset current verified file and verify another document"
                 >
                   <RotateCcw size={15} />
-                  <span>Verify Another PDF (Reset)</span>
+                  <span>Verify Another PDF</span>
                 </button>
               </div>
 
