@@ -1,17 +1,13 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { UploadCloud, FileText, Sparkles, FolderUp } from 'lucide-react';
-import { SAMPLE_DOCUMENTS } from '../data/sampleDocuments';
-import type { ValidatedFile } from '../types';
+import { UploadCloud, FolderUp } from 'lucide-react';
 
 interface DropzoneProps {
   onFilesSelected: (files: File[]) => void;
-  onSelectSample: (sampleDoc: Omit<ValidatedFile, 'id' | 'uploadDate'>) => void;
   onErrorToast: (msg: string) => void;
 }
 
 export const Dropzone: React.FC<DropzoneProps> = ({
   onFilesSelected,
-  onSelectSample,
   onErrorToast
 }) => {
   const [isDragOver, setIsDragOver] = useState(false);
@@ -153,28 +149,6 @@ export const Dropzone: React.FC<DropzoneProps> = ({
       <div className="dropzone-paste-tip">
         <span>Tip: you can also paste copied files here with</span>
         <kbd className="kbd-badge">Ctrl + V</kbd>
-      </div>
-
-      {/* Instant Samples Bar */}
-      <div className="sample-presets-box">
-        <div className="sample-presets-title">
-          <Sparkles size={13} style={{ display: 'inline', marginRight: 4, verticalAlign: -2 }} />
-          Or test instantly with official sample documents:
-        </div>
-        <div className="sample-pills-row">
-          {SAMPLE_DOCUMENTS.map((sample, idx) => (
-            <button
-              key={idx}
-              type="button"
-              className="sample-pill-btn"
-              onClick={() => onSelectSample(sample)}
-              title={`Click to load sample ${sample.metadata.documentType}`}
-            >
-              <FileText size={13} />
-              <span>{sample.sampleType}</span>
-            </button>
-          ))}
-        </div>
       </div>
     </div>
   );

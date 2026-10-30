@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   ShieldCheck,
   Lock,
@@ -6,9 +6,66 @@ import {
   Award,
   CheckCircle2,
   FileText,
-  Scale
+  Scale,
+  UserCheck
 } from 'lucide-react';
 import { TermAndCond } from './term&cond';
+
+const OwnershipScrapReveal: React.FC = () => {
+  const [isRevealed, setIsRevealed] = useState(false);
+  const timerRef = useRef<number | null>(null);
+
+  const clearTimer = () => {
+    if (timerRef.current !== null) {
+      window.clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      clearTimer();
+    };
+  }, []);
+
+  const handleToggleReveal = () => {
+    if (isRevealed) {
+      clearTimer();
+      setIsRevealed(false);
+      return;
+    }
+
+    clearTimer();
+    setIsRevealed(true);
+
+    timerRef.current = window.setTimeout(() => {
+      setIsRevealed(false);
+      timerRef.current = null;
+    }, 30000);
+  };
+
+  return (
+    <div className="ownership-disclaimer-row">
+      <span className="ownership-disclaimer-label">
+        <UserCheck size={14} style={{ color: 'var(--primary-green)' }} />
+        <span>Ownership:</span>
+      </span>
+      <button
+        type="button"
+        className={`instagram-scrap-box ${isRevealed ? 'is-revealed' : 'is-hidden'}`}
+        onClick={handleToggleReveal}
+        title={
+          isRevealed
+            ? 'Revealed · Click to hide'
+            : 'Click to scratch & reveal ownership'
+        }
+        aria-label={isRevealed ? 'Hide owner name' : 'Scratch to reveal owner name'}
+      >
+        <span className="scrap-text-content">Jonah Kamei</span>
+      </button>
+    </div>
+  );
+};
 
 export type AboutSubTab = 'about' | 'terms' | 'privacy';
 
@@ -230,6 +287,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({
               <p style={{ margin: '6px 0 0 0', fontSize: '0.84rem', color: 'var(--color-muted)' }}>
                 SignValid is an independent cryptographic verification utility. It is not affiliated with, maintained by, or operated by UIDAI, MeitY, the Controller of Certifying Authorities, or any central or state government portal. All verification uses publicly verifiable cryptographic standards and root certificates published by cca.gov.in.
               </p>
+              <OwnershipScrapReveal />
             </div>
           </div>
         )}

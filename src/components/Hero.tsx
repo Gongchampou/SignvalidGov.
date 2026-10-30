@@ -10,7 +10,6 @@ import type { ValidatedFile } from '../types';
 
 interface HeroProps {
   onFilesSelected: (files: File[]) => void;
-  onSelectSample: (sampleDoc: Omit<ValidatedFile, 'id' | 'uploadDate'>) => void;
   onErrorToast: (msg: string) => void;
   validatedFiles: ValidatedFile[];
   activeFileIndex: number;
@@ -27,7 +26,6 @@ interface HeroProps {
 
 export const Hero: React.FC<HeroProps> = ({
   onFilesSelected,
-  onSelectSample,
   onErrorToast,
   validatedFiles,
   activeFileIndex,
@@ -147,7 +145,6 @@ export const Hero: React.FC<HeroProps> = ({
               ) : (
                 <Dropzone
                   onFilesSelected={onFilesSelected}
-                  onSelectSample={onSelectSample}
                   onErrorToast={onErrorToast}
                 />
               )}

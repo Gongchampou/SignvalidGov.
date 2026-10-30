@@ -4757,3 +4757,188 @@ button {
 [data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
   background: #334155;
 }
+
+
+/* ==========================================================================
+   Instagram Text Scrap / Scratch-to-Reveal Ownership Widget
+   ========================================================================== */
+.ownership-disclaimer-row {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border-subtle);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 0.84rem;
+}
+
+.ownership-disclaimer-label {
+  font-weight: 600;
+  color: var(--color-heading-dark);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.instagram-scrap-box {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 14px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.86rem;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  border: 1px solid transparent;
+  outline: none;
+}
+
+/* Hidden / Instagram Scratched Foil Texture */
+.instagram-scrap-box.is-hidden {
+  background: repeating-linear-gradient(
+    -45deg,
+    #94a3b8 0px,
+    #94a3b8 2px,
+    #cbd5e1 2px,
+    #cbd5e1 6px,
+    #64748b 6px,
+    #64748b 8px,
+    #e2e8f0 8px,
+    #e2e8f0 12px
+  );
+  border: 1px dashed #64748b;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.instagram-scrap-box.is-hidden:hover {
+  transform: translateY(-1px) scale(1.02);
+  border-color: #126b44;
+  box-shadow: 0 4px 12px rgba(18, 107, 68, 0.18);
+}
+
+.instagram-scrap-box.is-hidden:active {
+  transform: scale(0.98);
+}
+
+.instagram-scrap-box.is-hidden .scrap-text-content {
+  filter: blur(6px);
+  opacity: 0.2;
+  color: #1e293b;
+  letter-spacing: 1px;
+}
+
+.instagram-scrap-box.is-hidden .scrap-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  color: #1e293b;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.92);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  position: relative;
+  z-index: 2;
+}
+
+/* Revealed Style */
+.instagram-scrap-box.is-revealed {
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  border: 1px solid #10b981;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+  animation: scrapRevealPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.instagram-scrap-box.is-revealed:hover {
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.instagram-scrap-box.is-revealed .scrap-text-content {
+  filter: none;
+  opacity: 1;
+  color: #047857;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.instagram-scrap-box.is-revealed .scrap-timer-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  background-color: rgba(6, 95, 70, 0.12);
+  color: #065f46;
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-family: var(--font-sans);
+}
+
+.scrap-progress-track {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2.5px;
+  background: #10b981;
+  transition: width 1s linear;
+}
+
+@keyframes scrapRevealPop {
+  0% { transform: scale(0.94); opacity: 0.8; }
+  60% { transform: scale(1.04); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+/* Dark Mode Overrides */
+[data-theme="dark"] .instagram-scrap-box.is-hidden {
+  background: repeating-linear-gradient(
+    -45deg,
+    #334155 0px,
+    #334155 2px,
+    #1e293b 2px,
+    #1e293b 6px,
+    #475569 6px,
+    #475569 8px,
+    #0f172a 8px,
+    #0f172a 12px
+  );
+  border-color: #64748b;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .instagram-scrap-box.is-hidden .scrap-text-content {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .instagram-scrap-box.is-hidden .scrap-hint {
+  background: rgba(15, 23, 42, 0.92);
+  color: #f1f5f9;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .instagram-scrap-box.is-revealed {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.18) 0%, rgba(5, 150, 105, 0.25) 100%);
+  border-color: #10b981;
+  box-shadow: 0 2px 12px rgba(16, 185, 129, 0.3);
+}
+
+[data-theme="dark"] .instagram-scrap-box.is-revealed .scrap-text-content {
+  color: #6ee7b7;
+}
+
+[data-theme="dark"] .instagram-scrap-box.is-revealed .scrap-timer-badge {
+  background-color: rgba(110, 231, 183, 0.15);
+  color: #a7f3d0;
+}
+
+[data-theme="dark"] .scrap-progress-track {
+  background: #34d399;
+}

@@ -180,47 +180,6 @@ export const App: React.FC = () => {
     }
   };
 
-  // Instant testing with pre-computed official samples
-  const handleSelectSample = (sampleDoc: Omit<ValidatedFile, 'id' | 'uploadDate'>) => {
-    // Security rate check on sample trigger
-    const sampleRateCheck = securityRateLimiter.evaluateSampleTest();
-    if (!sampleRateCheck.allowed) {
-      addToast(sampleRateCheck.message, 'error');
-      return;
-    }
-
-    navigateTo('validate');
-    setIsProcessing(true);
-    setProcessingFileName(sampleDoc.name);
-    setProcessingProgress(30);
-    setProcessingStep('Loading sample certificate from trust registry...');
-
-    setTimeout(() => {
-      setProcessingProgress(70);
-      setProcessingStep('Validating against CCA India Root...');
-    }, 400);
-
-    setTimeout(() => {
-      const sampleItem: ValidatedFile = {
-        ...sampleDoc,
-        id: Date.now().toString(),
-        uploadDate: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) + ' IST'
-      };
-
-      confetti({
-        particleCount: 50,
-        spread: 60,
-        origin: { y: 0.6 },
-        colors: ['#126B44', '#10B981', '#34D399']
-      });
-
-      setValidatedFiles(prev => [sampleItem, ...prev]);
-      setActiveFileIndex(0);
-      setIsProcessing(false);
-      addToast(`Sample "${sampleDoc.sampleType}" verified with CCA India!`, 'success');
-    }, 900);
-  };
-
   const handleCopyDigest = (text: string) => {
     navigator.clipboard.writeText(text);
     addToast('SHA-256 checksum copied to clipboard!', 'success');
@@ -262,7 +221,6 @@ export const App: React.FC = () => {
             {/* Validation Workspace Hero (Dropzone + Live Preview + Results) */}
             <Hero
               onFilesSelected={handleFilesSelected}
-              onSelectSample={handleSelectSample}
               onErrorToast={(msg) => addToast(msg, 'error')}
               validatedFiles={validatedFiles}
               activeFileIndex={activeFileIndex}
