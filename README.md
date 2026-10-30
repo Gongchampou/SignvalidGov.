@@ -17,7 +17,7 @@ It permanently fixes the notorious Adobe Acrobat **`? Validity Unknown`** warnin
       <img src="src/images/unverified.png" alt="Unknown signature" width="200">
     </td>
     <td align="center">
-      <strong style="font-size: 40px;">────────────────→</strong>
+      <strong style="font-size: 40px;">────────────────</strong>
     </td>
     <td align="center">
       <img src="src/images/verified.jpg" alt="Verified signature" width="200">

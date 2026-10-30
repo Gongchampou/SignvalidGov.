@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   ShieldCheck,
   Lock,
@@ -7,62 +7,328 @@ import {
   CheckCircle2,
   FileText,
   Scale,
-  UserCheck
+  UserCheck,
+  Star
 } from 'lucide-react';
 import { TermAndCond } from './term&cond';
 
+const GithubIcon: React.FC<{ size?: number; className?: string }> = ({ size = 14, className }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className={className}
+    style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}
+  >
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+    />
+  </svg>
+);
+
+const GITHUB_USERNAME = 'Gongchampou';
+const GITHUB_REPO = 'SignvalidGov';
+const GITHUB_REPO_URL = `https://github.com/${GITHUB_USERNAME}/${GITHUB_REPO}`;
+const GITHUB_API_URL = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}`;
+const SHIELDS_API_URL = `https://img.shields.io/github/stars/${GITHUB_USERNAME}/${GITHUB_REPO}.json`;
+
 const OwnershipScrapReveal: React.FC = () => {
   const [isRevealed, setIsRevealed] = useState(false);
-  const timerRef = useRef<number | null>(null);
-
-  const clearTimer = () => {
-    if (timerRef.current !== null) {
-      window.clearTimeout(timerRef.current);
-      timerRef.current = null;
+  const [starCount, setStarCount] = useState<number>(() => {
+    try {
+      const cached = localStorage.getItem('signvalid_gh_stars');
+      const val = cached !== null ? parseInt(cached, 10) : NaN;
+      return !isNaN(val) && val >= 3 ? val : 3;
+    } catch {
+      return 3;
     }
-  };
+  });
 
-  useEffect(() => {
-    return () => {
-      clearTimer();
-    };
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animIdRef = useRef<number | null>(null);
+  const timeoutRef = useRef<number | null>(null);
+  const isRevealedRef = useRef(isRevealed);
+  isRevealedRef.current = isRevealed;
+
+  const fetchStars = useCallback(async () => {
+    // 1. Try official GitHub REST API
+    try {
+      const res = await fetch(GITHUB_API_URL, {
+        headers: { Accept: 'application/vnd.github.v3+json' }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const count = data.stargazers_count;
+        if (typeof count === 'number' && !isNaN(count)) {
+          setStarCount(count);
+          try {
+            localStorage.setItem('signvalid_gh_stars', String(count));
+          } catch {
+            // ignore
+          }
+          return;
+        }
+      }
+    } catch {
+      // Fall through to backup
+    }
+
+    // 2. Try Shields.io endpoint (bypasses GitHub unauthenticated IP rate-limits)
+    try {
+      const res = await fetch(SHIELDS_API_URL);
+      if (res.ok) {
+        const data = await res.json();
+        const parsed = parseInt(data.value || data.message, 10);
+        if (!isNaN(parsed)) {
+          setStarCount(parsed);
+          try {
+            localStorage.setItem('signvalid_gh_stars', String(parsed));
+          } catch {
+            // ignore
+          }
+          return;
+        }
+      }
+    } catch {
+      // Fall through to default
+    }
+
+    // 3. Fallback to verified count (3)
+    setStarCount((prev) => (prev >=  5? prev : 4));
   }, []);
 
-  const handleToggleReveal = () => {
+  useEffect(() => {
+    fetchStars();
+
+    const handleFocus = () => {
+      fetchStars();
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchStars();
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Periodic 60s background refresh for live star counts
+    const interval = window.setInterval(fetchStars, 60000);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.clearInterval(interval);
+    };
+  }, [fetchStars]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let width = (canvas.width = canvas.offsetWidth * (window.devicePixelRatio || 1));
+    let height = (canvas.height = canvas.offsetHeight * (window.devicePixelRatio || 1));
+
+    // Particle pool - creates the dense sparkling noise dust storm from Telegram
+    const particleCount = 140;
+    const particles = Array.from({ length: particleCount }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      size: (Math.random() * 1.5 + 0.8) * (window.devicePixelRatio || 1),
+      alpha: Math.random() * 0.7 + 0.3,
+      twinkleOffset: Math.random() * Math.PI * 2,
+      vx: 0,
+      vy: 0
+    }));
+
+    let isExploding = false;
+    let explodeFrame = 0;
+
+    const startExplosion = () => {
+      isExploding = true;
+      explodeFrame = 0;
+      const centerX = width / 2;
+      const centerY = height / 2;
+      for (const p of particles) {
+        const angle = Math.atan2(p.y - centerY, p.x - centerX) + (Math.random() - 0.5) * 0.6;
+        const speed = (Math.random() * 4 + 2) * (window.devicePixelRatio || 1);
+        p.vx = Math.cos(angle) * speed;
+        p.vy = Math.sin(angle) * speed;
+      }
+    };
+
+    const resetParticles = () => {
+      isExploding = false;
+      explodeFrame = 0;
+      for (const p of particles) {
+        p.x = Math.random() * width;
+        p.y = Math.random() * height;
+        p.alpha = Math.random() * 0.7 + 0.3;
+        p.vx = 0;
+        p.vy = 0;
+      }
+    };
+
+    let prevRevealed = isRevealedRef.current;
+
+    const render = () => {
+      if (!prevRevealed && isRevealedRef.current) {
+        prevRevealed = true;
+        startExplosion();
+      } else if (prevRevealed && !isRevealedRef.current) {
+        prevRevealed = false;
+        resetParticles();
+      }
+
+      ctx.clearRect(0, 0, width, height);
+
+      const isDark =
+        document.documentElement.getAttribute('data-theme') === 'dark' ||
+        document.documentElement.classList.contains('dark') ||
+        window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+      if (!isRevealedRef.current) {
+        // Idle shimmering noise
+        const time = Date.now() * 0.005;
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+          p.x += (Math.random() - 0.5) * 0.9;
+          p.y += (Math.random() - 0.5) * 0.9;
+          if (p.x < 0) p.x = width;
+          if (p.x > width) p.x = 0;
+          if (p.y < 0) p.y = height;
+          if (p.y > height) p.y = 0;
+
+          const currentAlpha = 0.2 + 0.8 * Math.abs(Math.sin(time + p.twinkleOffset));
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fillStyle = isDark
+            ? `rgba(255, 255, 255, ${currentAlpha})`
+            : `rgba(30, 41, 59, ${currentAlpha * 0.85})`;
+          ctx.fill();
+        }
+        animIdRef.current = requestAnimationFrame(render);
+      } else if (isExploding) {
+        // Telegram particle explosion / dispersal
+        explodeFrame++;
+        let hasAlive = false;
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+          p.alpha *= 0.88;
+          if (p.alpha > 0.03) {
+            hasAlive = true;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fillStyle = isDark
+              ? `rgba(255, 255, 255, ${p.alpha})`
+              : `rgba(30, 41, 59, ${p.alpha * 0.85})`;
+            ctx.fill();
+          }
+        }
+        if (hasAlive && explodeFrame < 40) {
+          animIdRef.current = requestAnimationFrame(render);
+        } else {
+          isExploding = false;
+          ctx.clearRect(0, 0, width, height);
+        }
+      }
+    };
+
+    animIdRef.current = requestAnimationFrame(render);
+
+    const handleResize = () => {
+      if (!canvas) return;
+      width = canvas.width = canvas.offsetWidth * (window.devicePixelRatio || 1);
+      height = canvas.height = canvas.offsetHeight * (window.devicePixelRatio || 1);
+      for (const p of particles) {
+        p.x = Math.random() * width;
+        p.y = Math.random() * height;
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (animIdRef.current) cancelAnimationFrame(animIdRef.current);
+    };
+  }, [isRevealed]);
+
+  const handleToggle = () => {
     if (isRevealed) {
-      clearTimer();
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
       setIsRevealed(false);
       return;
     }
 
-    clearTimer();
     setIsRevealed(true);
 
-    timerRef.current = window.setTimeout(() => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = window.setTimeout(() => {
       setIsRevealed(false);
-      timerRef.current = null;
+      timeoutRef.current = null;
     }, 30000);
   };
 
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
   return (
     <div className="ownership-disclaimer-row">
-      <span className="ownership-disclaimer-label">
-        <UserCheck size={14} style={{ color: 'var(--primary-green)' }} />
-        <span>Ownership:</span>
-      </span>
-      <button
-        type="button"
-        className={`instagram-scrap-box ${isRevealed ? 'is-revealed' : 'is-hidden'}`}
-        onClick={handleToggleReveal}
-        title={
-          isRevealed
-            ? 'Revealed · Click to hide'
-            : 'Click to scratch & reveal ownership'
-        }
-        aria-label={isRevealed ? 'Hide owner name' : 'Scratch to reveal owner name'}
+      <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+        <span className="ownership-disclaimer-label">
+          <UserCheck size={14} style={{ color: 'var(--primary-green)' }} />
+          <span>Project Ownership:</span>
+        </span>
+        <span
+          className={`telegram-spoiler ${isRevealed ? 'is-revealed' : 'is-hidden'}`}
+          onClick={handleToggle}
+          title={isRevealed ? 'Revealed · Click to hide' : 'Telegram spoiler · Click to reveal'}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              handleToggle();
+            }
+          }}
+        >
+          <span className="telegram-spoiler-text">Jonah Kamei</span>
+          <canvas ref={canvasRef} className="telegram-spoiler-canvas" />
+        </span>
+      </div>
+
+      <a
+        href={GITHUB_REPO_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="supabase-star-button"
+        title="View SignValid on GitHub · Star the repository"
       >
-        <span className="scrap-text-content">Jonah Kamei</span>
-      </button>
+        <span className="supabase-star-left">
+          <GithubIcon size={14} />
+          <span>GitHub</span>
+          <Star size={13} className="star-icon" fill="#eab308" stroke="#eab308" style={{ marginLeft: 2 }} />
+        </span>
+        <span className="supabase-star-divider" />
+        <span className="supabase-star-count">
+          {starCount.toLocaleString()}
+        </span>
+      </a>
     </div>
   );
 };

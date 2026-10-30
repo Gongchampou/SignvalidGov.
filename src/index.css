@@ -4942,3 +4942,243 @@ button {
 [data-theme="dark"] .scrap-progress-track {
   background: #34d399;
 }
+
+
+/* ==========================================================================
+   Telegram Spoiler Text Style
+   ========================================================================== */
+.telegram-spoiler {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.88rem;
+  vertical-align: middle;
+  background-color: rgba(100, 116, 139, 0.22);
+  transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  overflow: hidden;
+  line-height: 1.4;
+  border: 1px solid transparent;
+  min-height: 28px;
+}
+
+.telegram-spoiler:hover {
+  background-color: rgba(100, 116, 139, 0.32);
+}
+
+[data-theme="dark"] .telegram-spoiler {
+  background-color: rgba(15, 23, 42, 0.8);
+  border-color: rgba(51, 65, 85, 0.6);
+}
+
+[data-theme="dark"] .telegram-spoiler:hover {
+  background-color: rgba(30, 41, 59, 0.95);
+  border-color: rgba(71, 85, 105, 0.8);
+}
+
+.telegram-spoiler.is-revealed {
+  background-color: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+[data-theme="dark"] .telegram-spoiler.is-revealed {
+  background-color: rgba(16, 185, 129, 0.2);
+  border-color: rgba(16, 185, 129, 0.5);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+}
+
+.telegram-spoiler-text {
+  position: relative;
+  z-index: 1;
+  transition: color 0.25s ease, opacity 0.25s ease;
+  letter-spacing: 0.02em;
+}
+
+.telegram-spoiler.is-hidden .telegram-spoiler-text {
+  color: transparent !important;
+  text-shadow: none !important;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.telegram-spoiler.is-revealed .telegram-spoiler-text {
+  color: #047857;
+  font-weight: 800;
+}
+
+[data-theme="dark"] .telegram-spoiler.is-revealed .telegram-spoiler-text {
+  color: #6ee7b7;
+}
+
+.telegram-spoiler-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  border-radius: 6px;
+  z-index: 2;
+}
+
+
+/* ==========================================================================
+   GitHub Repo & Star Badge in Ownership Disclaimer Row
+   ========================================================================== */
+/* ==========================================================================
+   Supabase-Style GitHub Star Button
+   ========================================================================== */
+.supabase-star-button {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 6px;
+  border: 1px solid var(--border-medium);
+  background-color: var(--bg-surface);
+  text-decoration: none;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--color-heading-dark);
+  height: 28px;
+  line-height: 1;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  vertical-align: middle;
+}
+
+.supabase-star-button:hover {
+  background-color: var(--bg-subtle);
+  border-color: var(--color-muted);
+  color: var(--color-heading-dark);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+}
+
+.supabase-star-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 9px;
+  height: 100%;
+  font-weight: 600;
+  transition: color 0.15s ease;
+}
+
+.supabase-star-button:hover .supabase-star-left {
+  color: var(--primary-green);
+}
+
+.supabase-star-divider {
+  width: 1px;
+  height: 14px;
+  background-color: var(--border-medium);
+  flex-shrink: 0;
+}
+
+.supabase-star-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 9px;
+  height: 100%;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.76rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-muted);
+  transition: color 0.15s ease;
+}
+
+.supabase-star-button:hover .supabase-star-count {
+  color: var(--color-heading-dark);
+}
+
+.supabase-star-skeleton {
+  display: inline-block;
+  width: 12px;
+  height: 8px;
+  background-color: var(--border-medium);
+  border-radius: 2px;
+  animation: supabasePulse 1.2s ease-in-out infinite;
+}
+
+@keyframes supabasePulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+/* Dark Mode Overrides */
+[data-theme="dark"] .supabase-star-button {
+  background-color: #162032;
+  border-color: #334155;
+  color: #f1f5f9;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .supabase-star-button:hover {
+  background-color: #1e293b;
+  border-color: #64748b;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .supabase-star-button:hover .supabase-star-left {
+  color: #34d399;
+}
+
+[data-theme="dark"] .supabase-star-divider {
+  background-color: #334155;
+}
+
+[data-theme="dark"] .supabase-star-count {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .supabase-star-button:hover .supabase-star-count {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .supabase-star-skeleton {
+  background-color: #334155;
+}
+
+
+/* Ensure Star Count has 100% transparent background and no border */
+.supabase-star-count,
+.github-star-count-pill {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+[data-theme="dark"] .supabase-star-count,
+[data-theme="dark"] .github-star-count-pill {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.supabase-star-button:hover .supabase-star-count,
+.github-repo-badge:hover .github-star-count-pill {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+[data-theme="dark"] .supabase-star-button:hover .supabase-star-count,
+[data-theme="dark"] .github-repo-badge:hover .github-star-count-pill {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
