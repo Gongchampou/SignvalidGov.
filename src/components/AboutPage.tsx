@@ -11,7 +11,9 @@ import {
   Star
 } from 'lucide-react';
 import { TermAndCond } from './term&cond';
-
+  //in code line 100 ther is line to edit eh start no to add up or increase the start no.
+  //
+  //
 const GithubIcon: React.FC<{ size?: number; className?: string }> = ({ size = 14, className }) => (
   <svg
     width={size}
@@ -96,7 +98,7 @@ const OwnershipScrapReveal: React.FC = () => {
       // Fall through to default
     }
 
-    // 3. Fallback to verified count (3)
+    // 3. set start no to show it in webiste here to verified count (3,4,5 .....)
     setStarCount((prev) => (prev >=  5? prev : 4));
   }, []);
 
